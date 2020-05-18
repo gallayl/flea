@@ -4,7 +4,8 @@
 #include "../services/Logger.h"
 
 ArRequestHandlerFunction getUpdateForm = ([](AsyncWebServerRequest *request) {
-    request->send(200, "text/html", F("<form method='POST' action='/update' accept='application/octet-stream' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>"));
+    request->redirect("/update.html");
+    // request->send(200, "text/html", F("<form method='POST' action='/update' accept='application/octet-stream' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>"));
 });
 
 ArRequestHandlerFunction onPostUpdate = ([](AsyncWebServerRequest *request) {

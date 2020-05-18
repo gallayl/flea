@@ -8,11 +8,6 @@
         flex-grow: 1;
       }
     </style>
-    <script type="module" crossorigin="use-credentials" src="./app.js"></script>
-    <script
-      type="text/javascript"
-      src="https://unpkg.com/nipplejs@0.8.5/dist/nipplejs.js"
-    ></script>
   </head>
 
   <body>
@@ -22,29 +17,31 @@
           <a title="Console">&#9004;</a>
         </li>
 
-        <li class="selected">
+        <li >
           <a href="index.html">Joystick</a>
         </li>
         <li>
           <a href="console.html">Console</a>
         </li>
-        <li>
+        <li class="selected">
           <a href="update.html">Update</a>
         </li>
       </ul>
     </nav>
-    <div class="home-wrapper" id="joystickContainer"></div>
-    <div style="display: flex;">
-      <input
-        tabindex="Throttle range"
-        id="rangeSlider"
-        type="range"
-        min="1"
-        max="8"
-        step="1"
-        value="1"
-        style="position: fixed; bottom: 10px; width: 80%; left: 15%;"
-      />
+    <div style="display: flex; height: 100%; justify-content: center; align-items: center;">
+      <form
+        style="display: flex; flex-direction: column;"
+        method="POST"
+        action="/update"
+        accept="application/octet-stream"
+        enctype="multipart/form-data"
+      >
+        <input type="file" name="update" style="margin: 2em" accept="application/octet-stream" />
+        <input
+          type="submit"
+          value="Update"
+        />
+      </form>
     </div>
   </body>
 </html>

@@ -3,11 +3,12 @@
 #include "../mime.h"
 #include "../hw/Camera.h"
 
-#define PART_BOUNDARY "123456789000000000000987654321"
+#define PART_BOUNDARY "frame"
 
-static const char *_STREAM_CONTENT_TYPE = "multipart/x-mixed-replace" PART_BOUNDARY;
-static const char *_STREAM_BOUNDARY = "\r\n--" PART_BOUNDARY "\r\n";
-static const char *_STREAM_PART = "image/jpeg\r\nContent-Length: %u\r\n\r\n";
+static const char* _STREAM_CONTENT_TYPE = "multipart/x-mixed-replace;boundary=" PART_BOUNDARY;
+static const char* _STREAM_BOUNDARY = "\r\n--" PART_BOUNDARY "\r\n";
+static const char* _STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n";
+
 
 // ToDo: https://randomnerdtutorials.com/esp32-cam-video-streaming-web-server-camera-home-assistant/
 
@@ -15,28 +16,26 @@ ArRequestHandlerFunction getCameraStream = ([](AsyncWebServerRequest *request) {
     camera_fb_t *fb = NULL;
     char *part_buf[64];
 
-    AsyncResponseStream *response = request->beginResponseStream(_STREAM_CONTENT_TYPE, fb->len);
-
-    // while (true)
-    // {
+    while (true)
+    {
         fb = esp_camera_fb_get();
         if (!fb)
         {
             logInfo("Camera capture failed");
+            request->send(500);
             return;
         }
-        snprintf((char *)part_buf, 64, _STREAM_PART, fb->len);
-        response->addHeader("Content-Type", (char *)part_buf);
-        response->addHeader("boundary", _STREAM_BOUNDARY);
+        size_t hlen = snprintf((char *)part_buf, 64, _STREAM_PART, fb->len);
+        size_t allLen = hlen + fb->len + strlen(_STREAM_BOUNDARY);
+
+        AsyncResponseStream *response = request->beginResponseStream(_STREAM_CONTENT_TYPE, allLen);
+
+        response->write((const char *)part_buf, hlen);
         response->write(fb->buf, fb->len);
+        esp_camera_fb_return(fb);
         response->write(_STREAM_BOUNDARY, strlen(_STREAM_BOUNDARY));
-        if (fb)
-        {
-            esp_camera_fb_return(fb);
-            fb = NULL;
-        }
-    // }
-    request->send(response);
+        request->send(response);
+    }
 });
 
 ArRequestHandlerFunction getCameraImage = ([](AsyncWebServerRequest *request) {

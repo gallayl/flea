@@ -8,14 +8,19 @@
 #define CONFIG_SIZE 2048
 #define CONFIG_VALUE_SIZE 256
 
-#define CONFIG_WIFI_MODE "configWifiMode"
-#define CONFIG_WIFI_AP
+#define CONFIG_HTTP_PORT "httpPort"
+#define CONFIG_WEBSOCKETS_URL "webSocketsUrl"
+#define CONFIG_WEBSOCKETS_CLIENT_LIMIT "webSocketsClientLimit"
+
 
 StaticJsonDocument<CONFIG_SIZE> configJson;
 
 void setDefaultConfig()
 {
     configJson.clear();
+    configJson[CONFIG_HTTP_PORT] = 80;
+    configJson[CONFIG_WEBSOCKETS_URL] = "/ws";
+    configJson[CONFIG_WEBSOCKETS_CLIENT_LIMIT] = 1;
 }
 
 void initConfig()
@@ -69,6 +74,18 @@ void saveConfigFile(){
 }
 
 void setConfigValue(String key, String value)
+{
+    configJson[key] = value;
+    saveConfigFile();
+}
+
+void setConfigValue(String key, int value)
+{
+    configJson[key] = value;
+    saveConfigFile();
+}
+
+void setConfigValue(String key, float value)
 {
     configJson[key] = value;
     saveConfigFile();
