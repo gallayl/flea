@@ -31,6 +31,7 @@ const socket = new WebSocketService({
       incoming.innerText = evt.data;
     }
     textArea.appendChild(incoming);
+    textArea.scrollTop = textArea.scrollHeight;
   }
 });
 
@@ -72,7 +73,7 @@ textInput.onkeydown = (event) => {
     enterpressed();
   } else if (event.key === "ArrowUp"){
     historyPointer= Math.max(historyPointer - 1, 0);
-    textInput.value = history[historyPointer] || "";
+    textInput.value = history[historyPointer - 1] || "";
     selectInputTextValue(event.currentTarget);
   } else if (event.key === "ArrowDown") {
     historyPointer= Math.min(historyPointer + 1, history.length);

@@ -20,7 +20,6 @@ export class WebSocketService {
 
     this.socket.onmessage = evt => {
       this.options.onMessage && this.options.onMessage(evt);
-      console.log("Message received:", evt.data);
     };
   }
 
@@ -30,6 +29,10 @@ export class WebSocketService {
   ) {
     this.options = options;
     this.createSocket();
+    window.addEventListener("unload", ()=>{
+      this.socket?.close();
+      console.log("Disconnecting due unload...")
+    })
   }
 
   send(message) {

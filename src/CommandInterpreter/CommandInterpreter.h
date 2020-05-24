@@ -9,14 +9,13 @@
 #include "CustomCommands/reset.h"
 #include "CustomCommands/servo.h"
 #include "CustomCommands/showlog.h"
-#include "CustomCommands/unknown.h"
+#include "CustomCommands/wifi.h"
 
 #define COMMANDS_SIZE 128
 
 class CommandInterpreter
 {
 private:
-    CustomCommand &_unknownCommand;
     static CommandInterpreter *instance;
 
     uint8_t _registeredCommandsCount = 0;
@@ -25,7 +24,7 @@ private:
         this->RegisteredCommands[this->_registeredCommandsCount] = newCommand;
         this->_registeredCommandsCount++;
     }
-    CommandInterpreter(CustomCommand &unknownCommandReference = *(new CustomCommand("", [](String command) { return String("Unknown command."); }))) : _unknownCommand(unknownCommandReference)
+    CommandInterpreter()
     {
     }
 
@@ -53,8 +52,7 @@ public:
                 return result;
             }
         }
-        String result = this->_unknownCommand.Execute(command);
-        return result;
+        return String("{\"message\": \"Unknown command: " + CommandParser::GetCommandName(command) + ".\", \"availableCommands\": \""+this->getAvailableCommands()+"\"}");
     }
 
     CustomCommand RegisteredCommands[COMMANDS_SIZE];
@@ -63,7 +61,7 @@ public:
     {
         if (instance == 0)
         {
-            CommandInterpreter *ci = new CommandInterpreter(*unknownCommand);
+            CommandInterpreter *ci = new CommandInterpreter();
             ci->RegisterCommand(*reset);
             ci->RegisterCommand(*configAction);
             ci->RegisterCommand(*i2cCommand);
@@ -73,6 +71,7 @@ public:
             ci->RegisterCommand(*moveAction);
             ci->RegisterCommand(*showLogAction);
             ci->RegisterCommand(*pwmCommand);
+            ci->RegisterCommand(*wifiCommand);
             instance = ci;
         }
 

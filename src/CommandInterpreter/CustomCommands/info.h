@@ -4,6 +4,7 @@
 #include "../CustomCommand.h"
 #include "../../hw/Camera.h"
 #include "../../hw/Display.h"
+#include "../../hw/WiFi.h"
 #include "../../services/FtpServer.h"
 #include <ArduinoJson.h>
 #include <WiFi.h>
@@ -39,30 +40,7 @@ String getResetReason()
     return String("Unknown");
 }
 
-String getSignalStrength(int32_t rssi)
-{
-    if (rssi > -30)
-    {
-        return "Amazing";
-    }
-    else if (rssi > -67)
-    {
-        return "Very good";
-    }
-    else if (rssi > -70)
-    {
-        return "Okay (not good, not terrible)";
-    }
-    else if (rssi > -80)
-    {
-        return "Not good";
-    }
-    else if (rssi > -90)
-    {
-        return "Unusable";
-    }
-    return "Unknown";
-}
+
 
 CustomCommand *infoAction = new CustomCommand("info", [](String command) {
     StaticJsonDocument<512> response;
@@ -86,14 +64,6 @@ CustomCommand *infoAction = new CustomCommand("info", [](String command) {
     spiffs["totalBytes"] = SPIFFS.totalBytes();
     spiffs["usedBytes"] = SPIFFS.usedBytes();
     
-    JsonObject network = response.createNestedObject("network");
-    network["ipAddress"] = WiFi.localIP().toString();
-    network["macAddress"] = WiFi.macAddress();
-    int32_t rssi = WiFi.RSSI();
-    network["ssid"] = WiFi.SSID();
-    network["wifiStrengh"] = getSignalStrength(rssi);
-    network["wifiRssiDb"] = rssi;
-
     JsonObject status = response.createNestedObject("status");
     status["isSdAvailable"] = isStorageAvailable;
     status["isDisplayAvailable"] = isDisplayAvailable;
