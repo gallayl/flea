@@ -1,7 +1,12 @@
 #pragma once
 
 #include <ESPAsyncWebServer.h>
+
+#ifdef ESP32
 #include <Update.h>
+#else
+#include <ArduinoOTA.h>
+#endif
 
 #include "./Config.h"
 #include "./WebServer.h"

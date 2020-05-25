@@ -7,9 +7,15 @@
 #include "../../hw/WiFi.h"
 #include "../../services/FtpServer.h"
 #include <ArduinoJson.h>
+#ifdef ESP32
 #include <WiFi.h>
 #include <SPIFFS.h>
+#else
+#include <ESP8266WiFi.h>
+#include <FS.h>
+#endif
 
+#ifdef ESP32
 String getResetReason()
 {
     switch (esp_reset_reason())
@@ -39,7 +45,7 @@ String getResetReason()
     }
     return String("Unknown");
 }
-
+#endif
 
 
 CustomCommand *infoAction = new CustomCommand("info", [](String command) {
@@ -47,12 +53,10 @@ CustomCommand *infoAction = new CustomCommand("info", [](String command) {
 
     JsonObject esp = response.createNestedObject("esp");
 
-    esp["restartReson"] = getResetReason();
     esp["sdkVersion"] = ESP.getSdkVersion();
     esp["cpuFreqMhz"] = ESP.getCpuFreqMHz();
     esp["freeHeap"] = ESP.getFreeHeap();
     esp["freeSkSpace"] = ESP.getFreeSketchSpace();
-    esp["freePsRam"] = ESP.getFreePsram();
 
     JsonObject flash = response.createNestedObject("flash");
 
@@ -60,21 +64,22 @@ CustomCommand *infoAction = new CustomCommand("info", [](String command) {
     flash["size"] = ESP.getFlashChipSize();
     flash["speed"] = ESP.getFlashChipSpeed();
 
+    #ifdef ESP32
+    esp["restartReson"] = getResetReason();
+    esp["freePsRam"] = ESP.getFreePsram();
     JsonObject spiffs = response.createNestedObject("spiffs");
     spiffs["totalBytes"] = SPIFFS.totalBytes();
     spiffs["usedBytes"] = SPIFFS.usedBytes();
+    JsonObject camera = response.createNestedObject("camera");
+    sensor_t *sensor = esp_camera_sensor_get();
+    camera["framesize"] = sensor->status.framesize;
+    camera["quality"] = sensor->status.quality;
+    camera["errorCode"] = cameraErrorCode;
+    #endif
     
     JsonObject status = response.createNestedObject("status");
     status["isSdAvailable"] = isStorageAvailable;
     status["isDisplayAvailable"] = isDisplayAvailable;
-
-    JsonObject camera = response.createNestedObject("camera");
-
-    sensor_t *sensor = esp_camera_sensor_get();
-   
-    camera["framesize"] = sensor->status.framesize;
-    camera["quality"] = sensor->status.quality;
-    camera["errorCode"] = cameraErrorCode;
 
     char buffer[512];
     serializeJson(response, buffer);

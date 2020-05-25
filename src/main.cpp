@@ -17,7 +17,11 @@ int16_t steerValue = 0;
 
 void setup()
 {
+    #ifdef ESP32
     Wire.begin(GPIO_NUM_14, GPIO_NUM_15);
+    #else
+    Wire.begin();
+    #endif
     initPwm();
     Serial.begin(9600);
     initTaskScheduler();
@@ -26,13 +30,11 @@ void setup()
     initWifi();
     initWebServer();
     initWebSockets();
-    esp_register_shutdown_handler([]() {
-        logInfo("Shutting down...");
-    });
+    #ifdef ESP32
     initFlashlight();
-    initFtpServer();
     initCamera();
-    logInfo(String("Wifi: " + WiFi.SSID() + "\nIP: " + WiFi.localIP().toString()));
+    #endif
+    initFtpServer();
 }
 
 void loop()
@@ -41,7 +43,10 @@ void loop()
     ftpSrv.handleFTP();
     if (Serial.available() > 0)
     {
-        char c[] = {(char)Serial.read()};
-        CommandInterpreter::GetInstance()->ExecuteCommand(c);
+        String command = Serial.readString();
+        String result = CommandInterpreter::GetInstance()->ExecuteCommand(command);
+        if (result.length()){
+            Serial.println(result);
+        }
     }
 }

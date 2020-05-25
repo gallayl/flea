@@ -1,5 +1,8 @@
 #pragma once
 
+
+#ifdef ESP32
+
 #include "../mime.h"
 #include "../hw/Camera.h"
 
@@ -129,3 +132,5 @@ ArRequestHandlerFunction setupCamera = ([](AsyncWebServerRequest *request) {
     serializeJson(response, buffer);
     request->send(200, MIME_json, String(buffer));
 });
+
+#endif

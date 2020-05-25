@@ -67,11 +67,13 @@ public:
             ci->RegisterCommand(*i2cCommand);
             ci->RegisterCommand(*infoAction);
             ci->RegisterCommand(*servoCommand);
-            ci->RegisterCommand(*flashlightAction);
             ci->RegisterCommand(*moveAction);
             ci->RegisterCommand(*showLogAction);
             ci->RegisterCommand(*pwmCommand);
             ci->RegisterCommand(*wifiCommand);
+            #ifdef ESP32
+            ci->RegisterCommand(*flashlightAction);
+            #endif
             instance = ci;
         }
 

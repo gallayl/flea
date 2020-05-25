@@ -1,6 +1,11 @@
 #pragma once
 
+#ifdef ESP32
 #include <SPIFFS.h>
+#else
+#include <FS.h>
+#endif
+
 #include "./Logger.h"
 #include "../utils/JsonMerge.h"
 #include "./TaskScheduler.h"
@@ -31,7 +36,11 @@ void saveConfigCallback()
 {
     if (isSaveNeeded)
     {
+        #ifdef ESP32
         File configFile = SPIFFS.open(CONFIG_FILE, FILE_WRITE);
+        #else
+        File configFile = SPIFFS.open(CONFIG_FILE, "w");
+        #endif
         if (!configFile)
         {
             logInfo("There was an error writing the config!");
@@ -77,7 +86,11 @@ void initConfig()
     }
     else
     {
+        #ifdef ESP32
         File file = SPIFFS.open(CONFIG_FILE);
+        #else
+        File file = SPIFFS.open(CONFIG_FILE, "r");
+        #endif
         if (file)
         {
             StaticJsonDocument<CONFIG_SIZE> fromFile;

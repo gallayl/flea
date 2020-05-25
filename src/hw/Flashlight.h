@@ -6,6 +6,8 @@
 #define FLASH_PIN 4
 #define FLASH_PWM_CHANNEL 0
 
+#ifdef ESP32
+
 void initFlashlight() {
     logInfo(F("Initializing Flashlight..."));
     ledcSetup(FLASH_PWM_CHANNEL,5000,8);
@@ -23,3 +25,5 @@ void flashlightOn() {
 void setFlashlightDuty(uint32_t duty){
     ledcWrite( FLASH_PWM_CHANNEL, duty);
 }
+
+#endif

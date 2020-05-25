@@ -1,9 +1,10 @@
 #pragma once
 
+#ifdef ESP32 
+
 #include "../CommandParser.h"
 #include "../CustomCommand.h"
 #include "../../hw/Flashlight.h"
-
 
 CustomCommand *flashlightAction = new CustomCommand("flashlight", [](String command) {
     String param = CommandParser::GetCommandParameter(command, 1);
@@ -20,3 +21,5 @@ CustomCommand *flashlightAction = new CustomCommand("flashlight", [](String comm
     }
     return String("");
 });
+
+#endif

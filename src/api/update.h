@@ -1,6 +1,10 @@
 #pragma once
 
+#ifdef ESP32
 #include <Update.h>
+#else
+#include <ArduinoOTA.h>
+#endif
 #include "../services/Logger.h"
 
 ArRequestHandlerFunction getUpdateForm = ([](AsyncWebServerRequest *request) {
@@ -36,10 +40,10 @@ ArUploadHandlerFunction onUploadUpdate = ([](AsyncWebServerRequest *request, Str
     {
         if (Update.end(true))
         {
-            AsyncWebServerResponse *response = request->beginResponse(200, "text/html", F("<html><head><meta http-equiv=\"refresh\" content=\"5\"></head><body>Update done, page will be refreshed.</body></html>"));
+            AsyncWebServerResponse *response = request->beginResponse(200, "text/html", "<html><head><meta http-equiv=\"refresh\" content=\"5\"></head><body>Update done, page will be refreshed.</body></html>");
             response->addHeader("Refresh", "5");
             request->send(response);
-            logInfo(F("Update finished, will restart..."));
+            logInfo("Update finished, will restart...");
             delay(300);
             ESP.restart();
         }

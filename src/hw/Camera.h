@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ESP32
+
 #include "../services/Logger.h"
 #include <esp_camera.h>
 
@@ -61,3 +63,9 @@ void initCamera()
     isCameraAvailable = true;
     logInfo(F("Cam initialized."));
 }
+#else
+void initCamera()
+{
+    logInfo(F("Camera not supported, skipping init..."));
+}
+#endif

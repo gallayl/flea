@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ESP32
+
 #include "../hw/Flashlight.h"
 
 ArRequestHandlerFunction setLights = ([](AsyncWebServerRequest *request) {
@@ -17,3 +19,5 @@ ArRequestHandlerFunction setLights = ([](AsyncWebServerRequest *request) {
     }
     request->send(500, "application/json", F("{\"success\":false}"));
 });
+
+#endif

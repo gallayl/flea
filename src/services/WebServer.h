@@ -1,7 +1,11 @@
 #pragma once
 
 #include <ESPAsyncWebServer.h>
+#ifdef ESP32
 #include <SPIFFS.h>
+#else 
+#include <FS.h>
+#endif
 #include "./Config.h"
 #include "./Logger.h"
 #include "../mime.h"
@@ -27,11 +31,12 @@ void initWebServer()
         request->send(200, MIME_plainText, String(ESP.getFreeHeap()));
     });
 
+    #ifdef ESP32
     server->on("/cam", HTTP_GET, getCameraImage);
     server->on("/stream", HTTP_GET, getCameraStream);
-
     server->on("/setupCam", HTTP_GET, setupCamera);
     server->on("/lights", HTTP_GET, setLights);
+    #endif
     server->onNotFound([](AsyncWebServerRequest *req) {
         req->send(404, MIME_plainText, "Not found :(");
     });
