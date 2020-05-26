@@ -10,7 +10,10 @@ export const Layout = Shade({
     return (
       <div style={{ width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <AppBar>
-          <RouteLink href="/">Flea</RouteLink>&nbsp;
+          <RouteLink href="/" style={{ marginRight: '2em' }}>
+            Flea
+          </RouteLink>
+          &nbsp;
           <RouteLink href="/">Home</RouteLink>&nbsp;
           <RouteLink href="/console">Console</RouteLink>&nbsp;
           <RouteLink href="/update">Update</RouteLink>&nbsp;
