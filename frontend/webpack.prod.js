@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 const common = require('./webpack.common.js')
 
 module.exports = merge(common, {
@@ -35,9 +35,8 @@ module.exports = merge(common, {
     new CleanWebpackPlugin(),
     new ForkTsCheckerWebpackPlugin({
       async: false,
-      useTypescriptIncrementalApi: true,
-      memoryLimit: 512,
-      silent: process.argv.includes('--json'),
+      // useTypescriptIncrementalApi: true,
+      // silent: process.argv.includes('--json'),
     }),
     new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
