@@ -15,7 +15,7 @@ module.exports = {
     new webpack.EnvironmentPlugin({
       APP_VERSION: require('./package.json').version,
       BUILD_DATE: new Date().toISOString(),
-      SITE: process.env.SITE || '',
+      SITE: process.env.SITE || 'http://http://192.168.0.38/',
     })
   ],
   module: {

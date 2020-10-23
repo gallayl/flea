@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
-const merge = require('webpack-merge')
+const {merge} = require('webpack-merge')
 const common = require('./webpack.common.js')
 
 module.exports = merge(common, {
   mode: 'development',
-  devtool: 'cheap-module-eval-source-map',
+  devtool: 'source-map',
   devServer: {
     historyApiFallback: true,
   },
@@ -15,9 +15,7 @@ module.exports = merge(common, {
     chunkFilename: 'static/js/[name].chunk.js',
   },
   plugins: [
-    new ForkTsCheckerWebpackPlugin({
-      eslint: true,
-    }),
+    new ForkTsCheckerWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './index.html',
       favicon: './favicon.ico',
