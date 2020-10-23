@@ -662,7 +662,7 @@
         "affectsGlobalScope": false
       },
       "../../src/index.tsx": {
-        "version": "3306de57b0cf6e79222d224aae3fef62081d5a2b74a4268ede0adfdcb95a0fc3",
+        "version": "034f141bd5b2bb35ff0001ed20ffcae1694422da753f8a979635e8bbd9ca7b32",
         "signature": "f761c91419d0a89422a0004ef1a92929dd4d2d5e5c16758654d8b0467d1998c6",
         "affectsGlobalScope": false
       },

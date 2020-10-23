@@ -10,7 +10,6 @@ shadeInjector.useLogging(VerboseConsoleLogger)
 shadeInjector.setExplicitInstance(
   {
     nodeEnv: process.env.NODE_ENV as 'development' | 'production',
-    debug: Boolean(process.env.DEBUG),
     buildDate: new Date(process.env.BUILD_DATE as string),
     site: process.env.SITE || window.location.host,
   },
