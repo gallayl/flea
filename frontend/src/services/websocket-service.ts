@@ -3,8 +3,10 @@ import { ScopedLogger } from '@furystack/logging'
 import { PathHelper, ObservableValue } from '@furystack/utils'
 import { EnvironmentService } from './environment-service'
 
-export interface WebSocketEvent {
+export interface WebSocketEvent<T = unknown> {
   type: 'incoming' | 'outgoing' | 'connection'
+  date: Date
+  dataObject?: T
   data: string
 }
 
@@ -14,10 +16,12 @@ export class WebSocketService {
 
   public eventStream: WebSocketEvent[] = []
 
+  public lastMessage = new ObservableValue<Omit<WebSocketEvent, 'date'>>()
+
   public send(data: string) {
     if (this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(data)
-      this.eventStream.push({ type: 'outgoing', data })
+      this.lastMessage.setValue({ type: 'outgoing', data })
     }
   }
 
@@ -31,6 +35,7 @@ export class WebSocketService {
     })
     this.isConnected.setValue(true)
   }).bind(this)
+
   private onDisconnect = (() => {
     this.logger.verbose({
       message: 'Disconnected',
@@ -39,25 +44,39 @@ export class WebSocketService {
     this.isConnected.setValue(false)
     this.disposeSocket(this.socket)
     this.socket = this.createSocket()
+    this.lastMessage.setValue({type: 'connection', data: 'Socket disconnected'})
   }).bind(this)
-  private onOpen() {
+
+  private onOpen = (() => {
     this.logger.verbose({ message: 'Opened', data: { socket: this.socket } })
-  }
-  private onClose() {
+    this.lastMessage.setValue({type: 'connection', data: 'Socket opened'})
+  }).bind(this)
+
+  private onClose = (() => {
     this.logger.verbose({ message: 'Closed', data: { socket: this.socket } })
-  }
+    this.lastMessage.setValue({type: 'connection', data: 'Socket closed'})
+  }).bind(this)
+
   private onError = (() => {
     this.logger.warning({
       message: 'Socket Error',
       data: { socket: this.socket },
     })
+    this.lastMessage.setValue({type: 'connection', data: 'Socket Error'})
   }).bind(this)
+
   private onMessage = ((ev: MessageEvent) => {
+    try {
+      this.lastMessage.setValue({ type: 'incoming', data: ev.data.toString(), dataObject: JSON.parse(ev.data.toString()) })
+       
+    } catch (error) {
+      this.lastMessage.setValue({ type: 'incoming', data: ev.data.toString() })
+    }
     this.logger.verbose({
       message: 'Message received',
       data: { socket: this.socket, data: ev.data },
     })
-    this.eventStream.push({ type: 'outgoing', data: ev.data.toString() })
+
   }).bind(this)
 
   private createSocket() {
@@ -80,8 +99,14 @@ export class WebSocketService {
     socket.removeEventListener('message', this.onMessage)
   }
 
+  public dispose(){
+    this.socket && this.disposeSocket(this.socket)
+    this.lastMessage.dispose()
+  }
+
   constructor(private env: EnvironmentService, injector: Injector) {
     this.logger = injector.logger.withScope('WebSocketService')
     this.socket = this.createSocket()
+    this.lastMessage.subscribe(msg => this.eventStream.push({...msg, date: new Date}))
   }
 }

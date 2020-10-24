@@ -23,8 +23,7 @@ CustomCommand *pwmCommand = new CustomCommand("pwm", [](String fullCommand) {
         {
             // Actually split the string in 2: replace ':' with 0
             *separator = 0;
-            // avoid 8-15 (DC motor short circuit)
-            int channel = constrain(atoi(command), 0, 7);
+            int channel = constrain(atoi(command), 0, 15);
             ++separator;
             long end = constrain(atol(separator), 0, 4095);
             pwm.setChannelPWM(channel, end);

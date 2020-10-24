@@ -46,7 +46,6 @@ ArRequestHandlerFunction getCameraImage = ([](AsyncWebServerRequest *request) {
     if (!fb)
     {
         request->send(500, MIME_plainText, "Camera capture failed");
-        esp_camera_fb_return(fb);
     }
     else
     {
@@ -54,8 +53,8 @@ ArRequestHandlerFunction getCameraImage = ([](AsyncWebServerRequest *request) {
         AsyncResponseStream *response = request->beginResponseStream(MIME_jpeg, fb->len);
         response->write(fb->buf, fb->len);
         request->send(response);
-        esp_camera_fb_return(fb);
     }
+    esp_camera_fb_return(fb);
 });
 
 ArRequestHandlerFunction setupCamera = ([](AsyncWebServerRequest *request) {

@@ -8,15 +8,15 @@ export const Layout = Shade({
   shadowDomName: 'flea-layout',
   render: () => {
     return (
-      <div style={{ width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', lineHeight: '18px' }}>
         <AppBar>
           <RouteLink href="/" style={{ marginRight: '2em' }}>
-            Flea
+            🐜 Flea
           </RouteLink>
           &nbsp;
-          <RouteLink href="/">Home</RouteLink>&nbsp;
-          <RouteLink href="/console">Console</RouteLink>&nbsp;
-          <RouteLink href="/update">Update</RouteLink>&nbsp;
+          <RouteLink href="/"> 🏠 Home</RouteLink>&nbsp;|&nbsp;
+          <RouteLink href="/console"> ⌨ Console</RouteLink>&nbsp;|&nbsp;
+          <RouteLink href="/update"> 🚀 Update</RouteLink>
           <div style={{ flex: '1' }} />
         </AppBar>
         <div style={{ width: '100%', height: '100%', flexGrow: '1' }}>
