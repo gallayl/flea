@@ -3,7 +3,7 @@
 #include <ESPAsyncWebServer.h>
 #ifdef ESP32
 #include <SPIFFS.h>
-#else 
+#else
 #include <FS.h>
 #endif
 #include "./Config.h"
@@ -21,8 +21,6 @@ void initWebServer()
     uint8_t port = configJson[CONFIG_HTTP_PORT].as<int>();
     server = new AsyncWebServer(port);
 
-    server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
-
     // Simple Firmware Update Form
     server->on("/update", HTTP_GET, getUpdateForm);
     server->on("/update", HTTP_POST, onPostUpdate, onUploadUpdate);
@@ -31,16 +29,18 @@ void initWebServer()
         request->send(200, MIME_plainText, String(ESP.getFreeHeap()));
     });
 
-    #ifdef ESP32
+#ifdef ESP32
     server->on("/cam", HTTP_GET, getCameraImage);
     server->on("/stream", HTTP_GET, getCameraStream);
     server->on("/setupCam", HTTP_GET, setupCamera);
     server->on("/lights", HTTP_GET, setLights);
-    #endif
-    server->onNotFound([](AsyncWebServerRequest *req) {
-        req->send(404, MIME_plainText, "Not found :(");
-    });
+#endif
+    server->serveStatic("/", SPIFFS, "/", "max-age=600").setDefaultFile("index.html");
 
+    server->onNotFound([](AsyncWebServerRequest *req) {
+        AsyncWebServerResponse *response = req->beginResponse(SPIFFS, "/index.html", "text/html; charset=UTF-8");
+        req->send(response);
+    });
     server->begin();
 
     logInfo(F("Server setup done."));

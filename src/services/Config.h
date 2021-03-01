@@ -28,19 +28,17 @@
 
 StaticJsonDocument<CONFIG_SIZE> configJson;
 
-
-
 boolean isSaveNeeded = false;
 
 void saveConfigCallback()
 {
     if (isSaveNeeded)
     {
-        #ifdef ESP32
+#ifdef ESP32
         File configFile = SPIFFS.open(CONFIG_FILE, FILE_WRITE);
-        #else
+#else
         File configFile = SPIFFS.open(CONFIG_FILE, "w");
-        #endif
+#endif
         if (!configFile)
         {
             logInfo("There was an error writing the config!");
@@ -54,7 +52,8 @@ void saveConfigCallback()
     }
 }
 
-void saveConfigFile(){
+void saveConfigFile()
+{
     isSaveNeeded = true;
 }
 
@@ -74,23 +73,26 @@ void setDefaultConfig()
 
 Task updateConfigIfNeeded(5000, 0, &saveConfigCallback);
 
-
 void initConfig()
 {
     logInfo("Initializing Config...");
     setDefaultConfig();
-    if (!SPIFFS.begin())
+#ifdef ESP32
+    if (SPIFFS.begin(true))
+#else
+    if (SPIFFS.begin())
+#endif
     {
         logInfo("SPIFFS not available, config will be the default");
         return;
     }
     else
     {
-        #ifdef ESP32
+#ifdef ESP32
         File file = SPIFFS.open(CONFIG_FILE);
-        #else
+#else
         File file = SPIFFS.open(CONFIG_FILE, "r");
-        #endif
+#endif
         if (file)
         {
             StaticJsonDocument<CONFIG_SIZE> fromFile;
@@ -115,7 +117,6 @@ void initConfig()
     }
     runner.addTask(updateConfigIfNeeded);
 }
-
 
 void setConfigValue(String key, String value)
 {

@@ -1,4 +1,4 @@
-import { AppBar } from '@furystack/shades-common-components'
+import { AppBar } from '@furystack/shades-common-components/dist/components/app-bar'
 import { Shade, createComponent, Router, RouteLink } from '@furystack/shades'
 import { JoystickPage } from '../pages/joystick-page'
 import { ConsolePage } from '../pages/console-page'
@@ -11,12 +11,12 @@ export const Layout = Shade({
       <div style={{ width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', lineHeight: '18px' }}>
         <AppBar>
           <RouteLink href="/" style={{ marginRight: '2em' }}>
-            🐜 Flea
+            Flea
           </RouteLink>
           &nbsp;
-          <RouteLink href="/"> 🏠 Home</RouteLink>&nbsp;|&nbsp;
-          <RouteLink href="/console"> ⌨ Console</RouteLink>&nbsp;|&nbsp;
-          <RouteLink href="/update"> 🚀 Update</RouteLink>
+          <RouteLink href="/">Home</RouteLink>&nbsp;|&nbsp;
+          <RouteLink href="/console">Console</RouteLink>&nbsp;|&nbsp;
+          <RouteLink href="/update">Update</RouteLink>
           <div style={{ flex: '1' }} />
         </AppBar>
         <div style={{ width: '100%', height: '100%', flexGrow: '1' }}>

@@ -8,7 +8,7 @@
 
 CustomCommand *moveAction = new CustomCommand("move", [](String fullCommand) {
     StaticJsonDocument<128> response;
-    
+
     String param1 = CommandParser::GetCommandParameter(fullCommand, 1);
     if (param1.compareTo("stop") == 0)
     {
@@ -24,9 +24,8 @@ CustomCommand *moveAction = new CustomCommand("move", [](String fullCommand) {
 
     response["speed"] = speed;
     response["steer"] = steer;
-    
+
     char buffer[128];
     serializeJson(response, buffer);
     return String(buffer);
-
 });

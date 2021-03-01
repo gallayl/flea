@@ -11,17 +11,16 @@
 #include "./hw/Pwm.h"
 #include "./hw/WiFi.h"
 
-
 int16_t throttleValue = 0;
 int16_t steerValue = 0;
 
 void setup()
 {
-    #ifdef ESP32
+#ifdef ESP32
     Wire.begin(GPIO_NUM_14, GPIO_NUM_15);
-    #else
+#else
     Wire.begin();
-    #endif
+#endif
     initPwm();
     Serial.begin(9600);
     initTaskScheduler();
@@ -30,10 +29,10 @@ void setup()
     initWifi();
     initWebServer();
     initWebSockets();
-    #ifdef ESP32
+#ifdef ESP32
     initFlashlight();
     initCamera();
-    #endif
+#endif
     initFtpServer();
 }
 
@@ -41,12 +40,4 @@ void loop()
 {
     runner.execute();
     ftpSrv.handleFTP();
-    if (Serial.available() > 0)
-    {
-        String command = Serial.readString();
-        String result = CommandInterpreter::GetInstance()->ExecuteCommand(command);
-        if (result.length()){
-            Serial.println(result);
-        }
-    }
 }

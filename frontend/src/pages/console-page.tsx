@@ -1,24 +1,24 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Button } from '@furystack/shades-common-components'
+import { Button } from '@furystack/shades-common-components/dist/components/button'
 import { WebSocketEvent, WebSocketService } from '../services/websocket-service'
 
-export const ConsoleEntryList = Shade<unknown, {webSocketService: WebSocketService; entries: WebSocketEvent<any>[]}>({
+export const ConsoleEntryList = Shade<unknown, { webSocketService: WebSocketService; entries: WebSocketEvent<any>[] }>({
   shadowDomName: 'flea-console-entries',
   getInitialState: ({ injector }) => ({
     webSocketService: injector.getInstance(WebSocketService),
     entries: injector.getInstance(WebSocketService).eventStream,
   }),
   constructed: ({ getState, updateState, element }) => {
-    const updateEvents = getState().webSocketService.lastMessage.subscribe(() =>{
+    const updateEvents = getState().webSocketService.lastMessage.subscribe(() => {
       updateState({ entries: getState().webSocketService.eventStream })
-      element.parentElement?.scrollTo({top: element.firstElementChild?.scrollHeight || Number.MAX_SAFE_INTEGER})
+      element.parentElement?.scrollTo({ top: element.firstElementChild?.scrollHeight || Number.MAX_SAFE_INTEGER })
     })
-    element.parentElement?.scrollTo({top: element.firstElementChild?.scrollHeight || Number.MAX_SAFE_INTEGER})
+    element.parentElement?.scrollTo({ top: element.firstElementChild?.scrollHeight || Number.MAX_SAFE_INTEGER })
     return () => {
       updateEvents.dispose()
     }
   },
-  render: ({getState}) => {
+  render: ({ getState }) => {
     return (
       <div >
         {getState().entries.map((event) => (
@@ -35,10 +35,10 @@ export const ConsoleEntryList = Shade<unknown, {webSocketService: WebSocketServi
                 marginRight: '1em',
                 color: event.type === 'incoming' ? '#aa2233' : '#22bb33',
               }}>
-              {event.type === 'incoming' ? '◀' : event.type === 'outgoing' ? '▶' : '🔌'}{' '}
+              {event.type === 'incoming' ? '<' : event.type === 'outgoing' ? '>' : '|'}{' '}
             </div>{' '}
-            {event.dataObject ? <code style={{whiteSpace: 'pre-wrap'}}>{JSON.stringify(event.dataObject, undefined, 2)}</code> : <div> {event.data} </div>}
-            
+            {event.dataObject ? <code style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(event.dataObject, undefined, 2)}</code> : <div> {event.data} </div>}
+
           </div>
         ))}
       </div>
@@ -66,16 +66,16 @@ export const ConsolePage = Shade<
           overflow: 'hidden',
           color: '#bbb',
         }}>
-          <div style={{ flexGrow: '1', overflow: 'auto', height: '100px', padding: '1em' }}>
+        <div style={{ flexGrow: '1', overflow: 'auto', height: '100px', padding: '1em' }}>
           <ConsoleEntryList />
-          </div>
+        </div>
         <form
           style={{ display: 'flex', flexDirection: 'row', width: '100%', flexShrink: '0' }}
           onsubmit={(ev) => {
             ev.preventDefault()
             getState().webSocketService.send(getState().command)
             updateState({ command: '' }, true)
-            ;(ev.target as HTMLFormElement).reset()
+              ; (ev.target as HTMLFormElement).reset()
           }}>
           <input
             autofocus

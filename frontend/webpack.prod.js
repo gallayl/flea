@@ -41,6 +41,7 @@ module.exports = merge(common, {
     new HtmlWebpackPlugin({
       template: './index.html',
       favicon: './favicon.ico',
+      attributes: function (chunk) { return { charset: 'UTF-8' } },
       minify: {
         removeComments: true,
         collapseWhitespace: true,
