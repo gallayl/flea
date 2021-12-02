@@ -58,18 +58,20 @@ String getEncryptionType(wifi_auth_mode_t type)
     }
 }
 #else
-String getEncryptionType(uint8_t type){
-    switch (type){
-        case ENC_TYPE_WEP:
-            return F("ENC_TYPE_WEP");
-        case ENC_TYPE_TKIP:
-            return F("ENC_TYPE_TKIP");
-        case ENC_TYPE_CCMP:
-            return F("ENC_TYPE_CCMP");
-        case ENC_TYPE_NONE:
-            return F("ENC_TYPE_NONE");
-        case ENC_TYPE_AUTO:
-            return F("ENC_TYPE_AUTO");
+String getEncryptionType(uint8_t type)
+{
+    switch (type)
+    {
+    case ENC_TYPE_WEP:
+        return F("ENC_TYPE_WEP");
+    case ENC_TYPE_TKIP:
+        return F("ENC_TYPE_TKIP");
+    case ENC_TYPE_CCMP:
+        return F("ENC_TYPE_CCMP");
+    case ENC_TYPE_NONE:
+        return F("ENC_TYPE_NONE");
+    case ENC_TYPE_AUTO:
+        return F("ENC_TYPE_AUTO");
     }
     return "Unknown";
 }
@@ -179,8 +181,9 @@ void reinitWifiSettings()
 void initWifi()
 {
     reinitWifiSettings();
-    #ifdef ESP32
+#ifdef ESP32
     WiFi.onEvent(WiFiEvent);
-    #endif
+#endif
+    WiFi.hostname("Flea");
     WiFi.begin();
 }

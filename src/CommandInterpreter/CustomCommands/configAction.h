@@ -28,6 +28,11 @@ CustomCommand *configAction = new CustomCommand("config", [](String command) {
         }
     }
 
+    if (!operation.compareTo("save"))
+    {
+        saveConfigCallback();
+    }
+
     char buffer[CONFIG_SIZE];
     serializeJson(configJson, buffer);
     return String(buffer);

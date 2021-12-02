@@ -3,7 +3,7 @@
 #include <ArduinoJson.h>
 #ifdef ESP32
 #include <WiFi.h>
-#else 
+#else
 #include <ESP8266WiFi.h>
 #endif
 #include <IPAddress.h>
@@ -74,7 +74,8 @@ CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command) {
     if (!operation.compareTo("info"))
     {
         StaticJsonDocument<512> response;
-        if (WiFi.getMode() == WIFI_AP || WiFi.getMode() == WIFI_AP_STA)
+        WiFiMode mode = WiFi.getMode();
+        if (mode == WIFI_AP || mode == WIFI_AP_STA)
         {
             JsonObject ap = response.createNestedObject("ap");
             ap["ipAddress"] = WiFi.localIP().toString();
@@ -82,8 +83,7 @@ CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command) {
             ap["ssid"] = WiFi.SSID();
         }
 
-
-        if (WiFi.getMode() == WIFI_STA || WiFi.getMode() == WIFI_AP_STA)
+        if (mode == WIFI_STA || mode == WIFI_AP_STA)
         {
             JsonObject sta = response.createNestedObject("sta");
             sta["ipAddress"] = WiFi.softAPIP().toString();
@@ -96,6 +96,7 @@ CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command) {
         int32_t rssi = WiFi.RSSI();
         response["wifiStrengh"] = getSignalStrength(rssi);
         response["wifiRssiDb"] = rssi;
+        response["status"] = WiFi.status();
 
         char buffer[512];
         serializeJson(response, buffer);

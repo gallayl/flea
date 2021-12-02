@@ -9,7 +9,7 @@
 #include <ArduinoJson.h>
 #ifdef ESP32
 #include <WiFi.h>
-#include <SPIFFS.h>
+#include <LittleFS.h>
 #else
 #include <ESP8266WiFi.h>
 #include <FS.h>
@@ -47,7 +47,6 @@ String getResetReason()
 }
 #endif
 
-
 CustomCommand *infoAction = new CustomCommand("info", [](String command) {
     StaticJsonDocument<512> response;
 
@@ -64,19 +63,19 @@ CustomCommand *infoAction = new CustomCommand("info", [](String command) {
     flash["size"] = ESP.getFlashChipSize();
     flash["speed"] = ESP.getFlashChipSpeed();
 
-    #ifdef ESP32
+#ifdef ESP32
     esp["restartReson"] = getResetReason();
     esp["freePsRam"] = ESP.getFreePsram();
-    JsonObject spiffs = response.createNestedObject("spiffs");
-    spiffs["totalBytes"] = SPIFFS.totalBytes();
-    spiffs["usedBytes"] = SPIFFS.usedBytes();
+    JsonObject LittleFS = response.createNestedObject("LittleFS");
+    LittleFS["totalBytes"] = LittleFS.totalBytes();
+    LittleFS["usedBytes"] = LittleFS.usedBytes();
     JsonObject camera = response.createNestedObject("camera");
     sensor_t *sensor = esp_camera_sensor_get();
     camera["framesize"] = sensor->status.framesize;
     camera["quality"] = sensor->status.quality;
     camera["errorCode"] = cameraErrorCode;
-    #endif
-    
+#endif
+
     JsonObject status = response.createNestedObject("status");
     status["isSdAvailable"] = isStorageAvailable;
     status["isDisplayAvailable"] = isDisplayAvailable;

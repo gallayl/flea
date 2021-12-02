@@ -1,16 +1,16 @@
 #pragma once
 
 #ifdef ESP32
-#include <SPIFFS.h>
+#include <LITTLEFS.h>
 #else
-#include <FS.h>
+#include <LittleFS.h>
 #endif
 
 #include "./Logger.h"
 #include "../utils/JsonMerge.h"
 #include "./TaskScheduler.h"
 
-#define CONFIG_FILE "/config.json"
+#define CONFIG_FILE "config.json"
 #define CONFIG_SIZE 2048
 #define CONFIG_VALUE_SIZE 256
 
@@ -34,11 +34,7 @@ void saveConfigCallback()
 {
     if (isSaveNeeded)
     {
-#ifdef ESP32
-        File configFile = SPIFFS.open(CONFIG_FILE, FILE_WRITE);
-#else
-        File configFile = SPIFFS.open(CONFIG_FILE, "w");
-#endif
+        File configFile = LittleFS.open(CONFIG_FILE, "w");
         if (!configFile)
         {
             logInfo("There was an error writing the config!");
@@ -78,20 +74,20 @@ void initConfig()
     logInfo("Initializing Config...");
     setDefaultConfig();
 #ifdef ESP32
-    if (SPIFFS.begin(true))
+    if (!LittleFS.begin(true))
 #else
-    if (SPIFFS.begin())
+    if (!LittleFS.begin())
 #endif
     {
-        logInfo("SPIFFS not available, config will be the default");
+        logInfo("FS not available, config will be the default");
         return;
     }
     else
     {
 #ifdef ESP32
-        File file = SPIFFS.open(CONFIG_FILE);
+        File file = LittleFS.open(CONFIG_FILE);
 #else
-        File file = SPIFFS.open(CONFIG_FILE, "r");
+        File file = LittleFS.open(CONFIG_FILE, "r");
 #endif
         if (file)
         {
@@ -100,7 +96,7 @@ void initConfig()
             switch (error.code())
             {
             case DeserializationError::Ok:
-                logInfo(F("Deserialization succeeded"));
+                logInfo(F("Settings loaded"));
                 merge(configJson.as<JsonVariant>(), fromFile.as<JsonVariantConst>());
                 break;
             case DeserializationError::InvalidInput:
@@ -113,6 +109,10 @@ void initConfig()
                 logInfo(F("Deserialization failed"));
                 break;
             }
+        }
+        else
+        {
+            logInfo("No config saved, using defaults");
         }
     }
     runner.addTask(updateConfigIfNeeded);

@@ -22,7 +22,7 @@ void setup()
     Wire.begin();
 #endif
     initPwm();
-    Serial.begin(9600);
+    Serial.begin(76800);
     initTaskScheduler();
     initConfig();
     initDisplay();
@@ -36,8 +36,20 @@ void setup()
     initFtpServer();
 }
 
+String serialData;
+String serialCommandResult;
 void loop()
 {
     runner.execute();
-    ftpSrv.handleFTP();
+    handleFtpServer();
+    if (Serial.available())
+    {
+        serialData = Serial.readString();
+        serialData.replace("\r\n", "");
+        serialData.replace("\n", "");
+        serialData.replace("\r", "");
+        serialCommandResult = CommandInterpreter::GetInstance()
+                                  ->ExecuteCommand(serialData);
+        logInfo(serialCommandResult);
+    }
 }

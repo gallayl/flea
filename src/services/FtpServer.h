@@ -2,9 +2,10 @@
 
 #include <ESP8266FtpServer.h>
 #ifdef ESP32
-#include "SPIFFS.h"
+#include "LittleFS.h"
 #else
-#include "FS.h"
+#include "LittleFS.h"
+
 #endif
 #include "./Logger.h"
 
@@ -19,12 +20,24 @@ void initFtpServer()
 {
     logInfo("Setting up FTP Server...");
 #ifdef ESP32
-    if (SPIFFS.begin(true))
+    if (LittleFS.begin(true))
 #else
-    if (SPIFFS.begin())
+    if (LittleFS.begin())
 #endif
     {
         ftpSrv.begin(FTP_USER, FTP_PASS);
         isStorageAvailable = true;
+    }
+    else
+    {
+        logInfo("FS not available");
+    }
+}
+
+void handleFtpServer()
+{
+    if (isStorageAvailable)
+    {
+        ftpSrv.handleFTP();
     }
 }

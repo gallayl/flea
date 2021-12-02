@@ -2,9 +2,9 @@
 
 #include <ESPAsyncWebServer.h>
 #ifdef ESP32
-#include <SPIFFS.h>
+#include <LITTLEFS.h>
 #else
-#include <FS.h>
+#include <LittleFS.h>
 #endif
 #include "./Config.h"
 #include "./Logger.h"
@@ -35,10 +35,10 @@ void initWebServer()
     server->on("/setupCam", HTTP_GET, setupCamera);
     server->on("/lights", HTTP_GET, setLights);
 #endif
-    server->serveStatic("/", SPIFFS, "/", "max-age=600").setDefaultFile("index.html");
+    server->serveStatic("/", LittleFS, "/", "max-age=600").setDefaultFile("index.html");
 
     server->onNotFound([](AsyncWebServerRequest *req) {
-        AsyncWebServerResponse *response = req->beginResponse(SPIFFS, "/index.html", "text/html; charset=UTF-8");
+        AsyncWebServerResponse *response = req->beginResponse(LittleFS, "/index.html", "text/html; charset=UTF-8");
         req->send(response);
     });
     server->begin();
