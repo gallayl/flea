@@ -5,7 +5,6 @@
 #include "../../hw/Camera.h"
 #include "../../hw/Display.h"
 #include "../../hw/WiFi.h"
-#include "../../services/FtpService.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
 
@@ -82,7 +81,6 @@ CustomCommand *infoAction = new CustomCommand("info", [](String command)
 #endif
 
     JsonObject status = response["status"].to<JsonObject>();
-    status["isSdAvailable"] = isStorageAvailable;
     status["isDisplayAvailable"] = isDisplayAvailable;
 
     char buffer[512];

@@ -21,7 +21,7 @@ ArUploadHandlerFunction uploadFiles = ([](AsyncWebServerRequest *request, String
         if (!file)
         {
             logInfo("Failed to open file for writing");
-            request->send(500, "application/json", "{\"error\":\"Failed to open file for writing\"}");
+            request->send(500, MIME_json, "{\"error\":\"Failed to open file for writing\"}");
             return;
         }
         file.write(data, len);
@@ -30,5 +30,5 @@ ArUploadHandlerFunction uploadFiles = ([](AsyncWebServerRequest *request, String
     if (final)
     {
         logInfo("Upload finished");
-        request->send(200, "application/javascript", "{\"status\":\"ok\"}");
+        request->send(200, MIME_json, "{\"status\":\"ok\"}");
     }; });

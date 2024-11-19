@@ -1,12 +1,10 @@
 #pragma once
 
-#include "../services/Logger.h"
-
 ArRequestHandlerFunction listFiles = ([](AsyncWebServerRequest *request)
                                       {
-                                          fs::File file = LittleFS.open("/", "r");
+                                          fs::File root = LittleFS.open("/", "r");
 
-                                          if (!file || !file.isDirectory())
+                                          if (!root || !root.isDirectory())
                                           {
                                               request->send(404, "");
                                           };
@@ -14,14 +12,31 @@ ArRequestHandlerFunction listFiles = ([](AsyncWebServerRequest *request)
                                           JsonDocument response;
                                           JsonArray fileList = response.to<JsonArray>();
 
-                                          file = file.openNextFile();
-
-                                          while (file)
+#ifdef ESP32
+                                          File file = root.openNextFile("r");
+#else
+                                          File file = root.openNextFile();
+#endif
+                                          do
                                           {
-                                            fileList.add(file.name());
-                                            file = file.openNextFile();
-                                          };
+                                            JsonObject o = fileList.add<JsonObject>();
+                                            o["name"] = file.name();
+                                            o["size"] = file.size();
+                                            o["isDir"] = file.isDirectory();
+#ifdef ESP32
+                                            o["path"] = file.path();
+#endif
+                                            o["lastWrite"] = file.getLastWrite();
+
+#ifdef ESP32
+                                          file = root.openNextFile("r");
+#else
+                                          file = root.openNextFile();
+#endif
+
+
+                                          } while (file);
 
                                           String responseStr;
                                           serializeJson(response, responseStr);
-                                          request->send(200, "application/json", responseStr); });
+                                          request->send(200, MIME_json, responseStr); });

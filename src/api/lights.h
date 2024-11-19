@@ -4,7 +4,8 @@
 
 #include "../hw/Flashlight.h"
 
-ArRequestHandlerFunction setLights = ([](AsyncWebServerRequest *request) {
+ArRequestHandlerFunction setLights = ([](AsyncWebServerRequest *request)
+                                      {
     int params = request->params();
     for(int i=0;i<params;i++){
         AsyncWebParameter* p = request->getParam(i);
@@ -13,11 +14,10 @@ ArRequestHandlerFunction setLights = ([](AsyncWebServerRequest *request) {
         uint32_t val = constrain(value.toInt(),1,255);
         if (!variable.compareTo("front")){
             setFlashlightDuty(val);
-            request->send(200, "application/json", String("Front set to:") + String(val));
+            request->send(200, MIME_json, String("Front set to:") + String(val));
             return;
         }
     }
-    request->send(500, "application/json", F("{\"success\":false}"));
-});
+    request->send(500, MIME_json, F("{\"success\":false}")); });
 
 #endif

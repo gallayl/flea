@@ -3,7 +3,6 @@
 #include "./services/Config.h"
 #include "./services/Logger.h"
 #include "./services/TaskScheduler.h"
-#include "./services/FtpService.h"
 #include "./services/WebServer.h"
 #include "./services/WebSocketServer.h"
 #include "./hw/Camera.h"
@@ -33,11 +32,9 @@ void setup()
     initFlashlight();
     initCamera();
 #endif
-    initFtpServer();
 }
 
 void loop()
 {
     runner.execute();
-    ftpSrv.handleFTP();
 }

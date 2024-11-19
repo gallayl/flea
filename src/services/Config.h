@@ -69,7 +69,12 @@ void initConfig()
 {
     logInfo("Initializing Config...");
     setDefaultConfig();
+
+#ifdef ESP32
+    if (LittleFS.begin(true))
+#else
     if (LittleFS.begin())
+#endif
     {
         logInfo("LittleFS not available, config will be the default");
         return;

@@ -7,4 +7,4 @@ ArRequestHandlerFunction showLog = ([](AsyncWebServerRequest *request)
                                           JsonDocument response = getLogResponse();
                                           String responseStr;
                                           serializeJson(response, responseStr);
-                                          request->send(200, "application/json", responseStr); });
+                                          request->send(200, MIME_json, responseStr); });
