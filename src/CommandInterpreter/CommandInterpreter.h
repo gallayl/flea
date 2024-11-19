@@ -5,6 +5,7 @@
 #include "CustomCommands/format.h"
 #include "CustomCommands/i2c.h"
 #include "CustomCommands/info.h"
+#include "CustomCommands/list.h"
 #include "CustomCommands/move.h"
 #include "CustomCommands/pwm.h"
 #include "CustomCommands/reset.h"
@@ -73,6 +74,7 @@ public:
             ci->RegisterCommand(*pwmCommand);
             ci->RegisterCommand(*wifiCommand);
             ci->RegisterCommand(*formatCommand);
+            ci->RegisterCommand(*showFileListCustomCommand);
 #ifdef ESP32
             ci->RegisterCommand(*flashlightAction);
 #endif

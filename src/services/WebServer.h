@@ -1,5 +1,13 @@
 #pragma once
 
+#ifdef ESP32
+#include <WiFi.h>
+#include <AsyncTCP.h>
+#else
+#include <ESP8266WiFi.h>
+#include <ESPAsyncTCP.h>
+#endif
+
 #include <ESPAsyncWebServer.h>
 #include <LittleFS.h>
 #include "./Config.h"
@@ -16,8 +24,10 @@ AsyncWebServer *server;
 
 void initWebServer()
 {
-    logInfo(F("Starting WEB server..."));
     uint8_t port = configJson[CONFIG_HTTP_PORT].as<int>();
+
+    logInfo(F("Starting WEB server on port: ") + String(port));
+
     server = new AsyncWebServer(port);
 
     // Simple Firmware Update Form
@@ -43,8 +53,10 @@ void initWebServer()
 
     server->onNotFound([](AsyncWebServerRequest *req)
                        {
+                        logInfo("Not found: " + req->url());
         AsyncWebServerResponse *response = req->beginResponse(LittleFS, "/index.html", "text/html; charset=UTF-8");
         req->send(response); });
+
     server->begin();
 
     logInfo(F("Server setup done."));

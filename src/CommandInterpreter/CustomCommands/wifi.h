@@ -24,6 +24,7 @@ CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command)
         {
             return String("{\"error\": \"ssid or password too short\"}");
         }
+        WiFi.persistent(true);
         WiFi.begin(ssid.c_str(), password.c_str());
         return String("{\"event\": \"connecting\"}");
     }

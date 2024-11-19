@@ -2,7 +2,6 @@
 #include <Wire.h>
 #include "./services/Config.h"
 #include "./services/Logger.h"
-#include "./services/TaskScheduler.h"
 #include "./services/WebServer.h"
 #include "./services/WebSocketServer.h"
 #include "./hw/Camera.h"
@@ -22,7 +21,6 @@ void setup()
 #endif
     initPwm();
     Serial.begin(9600);
-    initTaskScheduler();
     initConfig();
     initDisplay();
     initWifi();
@@ -36,5 +34,10 @@ void setup()
 
 void loop()
 {
-    runner.execute();
+    if (Serial.available())
+    {
+        String command = Serial.readStringUntil('\n');
+        String response = CommandInterpreter::GetInstance()->ExecuteCommand(command);
+        Serial.println(response);
+    }
 }

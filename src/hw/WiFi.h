@@ -2,8 +2,10 @@
 
 #ifdef ESP32
 #include <WiFi.h>
+#include <AsyncTCP.h>
 #else
 #include <ESP8266WiFi.h>
+#include <ESPAsyncTCP.h>
 #endif
 #include <WiFiClientSecure.h>
 
@@ -58,18 +60,20 @@ String getEncryptionType(wifi_auth_mode_t type)
     }
 }
 #else
-String getEncryptionType(uint8_t type){
-    switch (type){
-        case ENC_TYPE_WEP:
-            return F("ENC_TYPE_WEP");
-        case ENC_TYPE_TKIP:
-            return F("ENC_TYPE_TKIP");
-        case ENC_TYPE_CCMP:
-            return F("ENC_TYPE_CCMP");
-        case ENC_TYPE_NONE:
-            return F("ENC_TYPE_NONE");
-        case ENC_TYPE_AUTO:
-            return F("ENC_TYPE_AUTO");
+String getEncryptionType(uint8_t type)
+{
+    switch (type)
+    {
+    case ENC_TYPE_WEP:
+        return F("ENC_TYPE_WEP");
+    case ENC_TYPE_TKIP:
+        return F("ENC_TYPE_TKIP");
+    case ENC_TYPE_CCMP:
+        return F("ENC_TYPE_CCMP");
+    case ENC_TYPE_NONE:
+        return F("ENC_TYPE_NONE");
+    case ENC_TYPE_AUTO:
+        return F("ENC_TYPE_AUTO");
     }
     return "Unknown";
 }
@@ -163,24 +167,32 @@ void WiFiEvent(WiFiEvent_t event)
 
 void reinitWifiSettings()
 {
-    IPAddress ip;
-    IPAddress gateway;
-    IPAddress netmask;
 
-    ip.fromString(configJson[CONFIG_SOFT_AP_IP].as<String>());
-    gateway.fromString(configJson[CONFIG_SOFT_AP_GATEWAY].as<String>());
-    netmask.fromString(configJson[CONFIG_SOFT_AP_NETMASK].as<String>());
+    WiFiMode wifiMode = configJson[CONFIG_SOFT_AP_ENABLED].as<bool>() ? WIFI_AP_STA : WIFI_AP;
 
-    WiFi.mode(configJson[CONFIG_SOFT_AP_ENABLED].as<bool>() ? WIFI_AP_STA : WIFI_AP);
-    WiFi.softAPConfig(ip, gateway, netmask);
-    WiFi.softAP(configJson[CONFIG_SOFT_AP_SSID].as<String>().c_str(), configJson[CONFIG_SOFT_AP_KEY].as<String>().c_str());
+    if (wifiMode == WIFI_AP_STA)
+    {
+        IPAddress ip;
+        IPAddress gateway;
+        IPAddress netmask;
+
+        ip.fromString(configJson[CONFIG_SOFT_AP_IP].as<String>());
+        gateway.fromString(configJson[CONFIG_SOFT_AP_GATEWAY].as<String>());
+        netmask.fromString(configJson[CONFIG_SOFT_AP_NETMASK].as<String>());
+
+        WiFi.mode(wifiMode);
+        WiFi.softAPConfig(ip, gateway, netmask);
+        WiFi.softAP(configJson[CONFIG_SOFT_AP_SSID].as<String>().c_str(), configJson[CONFIG_SOFT_AP_KEY].as<String>().c_str());
+    }
 }
 
 void initWifi()
 {
+
     reinitWifiSettings();
-    #ifdef ESP32
+
+#ifdef ESP32
     WiFi.onEvent(WiFiEvent);
-    #endif
+#endif
     WiFi.begin();
 }

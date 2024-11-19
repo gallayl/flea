@@ -4,7 +4,6 @@
 
 #include "./Logger.h"
 #include "../utils/JsonMerge.h"
-#include "./TaskScheduler.h"
 
 #define CONFIG_FILE "/config.json"
 #define CONFIG_SIZE 2048
@@ -24,29 +23,16 @@
 
 JsonDocument configJson;
 
-boolean isSaveNeeded = false;
-
-void saveConfigCallback()
-{
-    if (isSaveNeeded)
-    {
-        File configFile = LittleFS.open(CONFIG_FILE, "w");
-        if (!configFile)
-        {
-            logInfo("There was an error writing the config!");
-        }
-        char buffer[CONFIG_SIZE];
-        serializeJsonPretty(configJson, buffer);
-        configFile.print(buffer);
-        configFile.close();
-        logInfo("Config saved.");
-        isSaveNeeded = false;
-    }
-}
-
 void saveConfigFile()
 {
-    isSaveNeeded = true;
+    File configFile = LittleFS.open(CONFIG_FILE, "w");
+    if (!configFile)
+    {
+        logInfo("There was an error writing the config!");
+    }
+    serializeJsonPretty(configJson, configFile);
+    configFile.close();
+    logInfo("Config saved.");
 }
 
 void setDefaultConfig()
@@ -63,17 +49,15 @@ void setDefaultConfig()
     configJson[CONFIG_SOFT_AP_KEY] = "flea12345";
 }
 
-Task updateConfigIfNeeded(5000, 0, &saveConfigCallback);
-
 void initConfig()
 {
     logInfo("Initializing Config...");
     setDefaultConfig();
 
 #ifdef ESP32
-    if (LittleFS.begin(true))
+    if (!LittleFS.begin(true))
 #else
-    if (LittleFS.begin())
+    if (!LittleFS.begin())
 #endif
     {
         logInfo("LittleFS not available, config will be the default");
@@ -85,11 +69,11 @@ void initConfig()
         if (file)
         {
             JsonDocument fromFile;
-            DeserializationError error = deserializeJson(fromFile, file.readString());
+            DeserializationError error = deserializeJson(fromFile, file);
             switch (error.code())
             {
             case DeserializationError::Ok:
-                logInfo(F("Deserialization succeeded"));
+                logInfo(F("Config file loaded succesfully."));
                 merge(configJson.as<JsonVariant>(), fromFile.as<JsonVariantConst>());
                 break;
             case DeserializationError::InvalidInput:
@@ -103,8 +87,11 @@ void initConfig()
                 break;
             }
         }
+        else
+        {
+            logInfo("No config file, using defaults.");
+        }
     }
-    runner.addTask(updateConfigIfNeeded);
 }
 
 void setConfigValue(String key, String value)

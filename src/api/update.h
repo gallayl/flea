@@ -7,19 +7,18 @@
 #endif
 #include "../services/Logger.h"
 
-ArRequestHandlerFunction getUpdateForm = ([](AsyncWebServerRequest *request) {
-    request->redirect("/update.html");
-    // request->send(200, "text/html", F("<form method='POST' action='/update' accept='application/octet-stream' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>"));
-});
+ArRequestHandlerFunction getUpdateForm = ([](AsyncWebServerRequest *request)
+                                          { request->send(200, "text/html", F("<form method='POST' action='/update' accept='application/octet-stream' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>")); });
 
-ArRequestHandlerFunction onPostUpdate = ([](AsyncWebServerRequest *request) {
+ArRequestHandlerFunction onPostUpdate = ([](AsyncWebServerRequest *request)
+                                         {
     boolean shouldReboot = !Update.hasError();
     AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", shouldReboot ? "OK" : "FAIL");
     response->addHeader("Connection", "close");
-    request->send(response);
-});
+    request->send(response); });
 
-ArUploadHandlerFunction onUploadUpdate = ([](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+ArUploadHandlerFunction onUploadUpdate = ([](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+                                          {
     if (!index)
     {
         
@@ -51,5 +50,4 @@ ArUploadHandlerFunction onUploadUpdate = ([](AsyncWebServerRequest *request, Str
         {
             Update.printError(Serial);
         }
-    }
-});
+    } });

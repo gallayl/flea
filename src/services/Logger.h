@@ -27,7 +27,7 @@ JsonDocument getLogResponse()
 {
     JsonDocument response;
     response["pointer"] = logPointer;
-    JsonArray entries;
+    JsonArray entries = response["entries"].to<JsonArray>();
     for (int i = logPointer; i < LOG_ENTRIES; i++)
     {
         if (logBuffer[i] != NULL && logBuffer[i].length() > 0)
@@ -42,8 +42,6 @@ JsonDocument getLogResponse()
             entries.add(logBuffer[i]);
         }
     }
-
-    response["entries"] = entries;
 
     return response;
 }
