@@ -1,27 +1,23 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Button } from '@furystack/shades-common-components/dist/components/button'
-import { WebSocketEvent, WebSocketService } from '../services/websocket-service'
+import { Button } from '@furystack/shades-common-components'
+import { WebSocketService } from '../services/websocket-service'
+import { ObservableValue } from '@furystack/utils'
 
-export const ConsoleEntryList = Shade<unknown, { webSocketService: WebSocketService; entries: WebSocketEvent<any>[] }>({
+export const ConsoleEntryList = Shade({
   shadowDomName: 'flea-console-entries',
-  getInitialState: ({ injector }) => ({
-    webSocketService: injector.getInstance(WebSocketService),
-    entries: injector.getInstance(WebSocketService).eventStream,
-  }),
-  constructed: ({ getState, updateState, element }) => {
-    const updateEvents = getState().webSocketService.lastMessage.subscribe(() => {
-      updateState({ entries: getState().webSocketService.eventStream })
-      element.parentElement?.scrollTo({ top: element.firstElementChild?.scrollHeight || Number.MAX_SAFE_INTEGER })
-    })
-    element.parentElement?.scrollTo({ top: element.firstElementChild?.scrollHeight || Number.MAX_SAFE_INTEGER })
-    return () => {
-      updateEvents.dispose()
-    }
+  constructed: ({ injector, element, useDisposable }) => {
+    useDisposable('lastMessageSubscription', () =>
+      injector.getInstance(WebSocketService).lastMessage.subscribe(() => {
+        element.parentElement?.scrollTo({ top: element.firstElementChild?.scrollHeight || Number.MAX_SAFE_INTEGER })
+      }),
+    )
   },
-  render: ({ getState }) => {
+  render: ({ injector, useObservable }) => {
+    const [] = useObservable('lastMessage', injector.getInstance(WebSocketService).lastMessage)
+
     return (
-      <div >
-        {getState().entries.map((event) => (
+      <div style={{ marginTop: '32px' }}>
+        {injector.getInstance(WebSocketService).eventStream.map((event) => (
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', fontFamily: 'monospace' }}>
             <div
               style={{
@@ -35,10 +31,13 @@ export const ConsoleEntryList = Shade<unknown, { webSocketService: WebSocketServ
                 marginRight: '1em',
                 color: event.type === 'incoming' ? '#aa2233' : '#22bb33',
               }}>
-              {event.type === 'incoming' ? '<' : event.type === 'outgoing' ? '>' : '|'}{' '}
-            </div>{' '}
-            {event.dataObject ? <code style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(event.dataObject, undefined, 2)}</code> : <div> {event.data} </div>}
-
+              {event.type === 'incoming' ? '<' : event.type === 'outgoing' ? '>' : '|'}
+            </div>
+            {event.dataObject ? (
+              <code style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(event.dataObject, undefined, 2)}</code>
+            ) : (
+              <div> {event.data} </div>
+            )}
           </div>
         ))}
       </div>
@@ -46,16 +45,13 @@ export const ConsoleEntryList = Shade<unknown, { webSocketService: WebSocketServ
   },
 })
 
-export const ConsolePage = Shade<
-  unknown,
-  { webSocketService: WebSocketService; command: string; }
->({
-  getInitialState: ({ injector }) => ({
-    webSocketService: injector.getInstance(WebSocketService),
-    command: '',
-  }),
+export const ConsolePage = Shade({
   shadowDomName: 'flea-console-page',
-  render: ({ getState, updateState }) => {
+  render: ({ useDisposable, injector }) => {
+    const service = injector.getInstance(WebSocketService)
+
+    const command = useDisposable('command', () => new ObservableValue<string>(''))
+
     return (
       <div
         style={{
@@ -73,15 +69,14 @@ export const ConsolePage = Shade<
           style={{ display: 'flex', flexDirection: 'row', width: '100%', flexShrink: '0' }}
           onsubmit={(ev) => {
             ev.preventDefault()
-            getState().webSocketService.send(getState().command)
-            updateState({ command: '' }, true)
-              ; (ev.target as HTMLFormElement).reset()
+            service.send(command.getValue())
+            ;(ev.target as HTMLFormElement).reset()
           }}>
           <input
             autofocus
             style={{ display: 'block', flexGrow: '1', width: '100%' }}
             placeholder="Command"
-            onkeyup={(ev) => updateState({ command: (ev.target as HTMLInputElement)?.value }, true)}
+            onkeyup={(ev) => command.setValue((ev.target as HTMLInputElement).value)}
           />
           <Button title="Send" type="submit">
             Send

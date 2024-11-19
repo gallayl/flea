@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifdef ESP32
 
 #include "../mime.h"
@@ -8,40 +7,36 @@
 
 #define PART_BOUNDARY "frame"
 
-static const char* _STREAM_CONTENT_TYPE = "multipart/x-mixed-replace;boundary=" PART_BOUNDARY;
-static const char* _STREAM_BOUNDARY = "\r\n--" PART_BOUNDARY "\r\n";
-static const char* _STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n";
-
+static const char *_STREAM_CONTENT_TYPE = "multipart/x-mixed-replace;boundary=" PART_BOUNDARY;
+static const char *_STREAM_BOUNDARY = "\r\n--" PART_BOUNDARY "\r\n";
+static const char *_STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n";
 
 // ToDo: https://randomnerdtutorials.com/esp32-cam-video-streaming-web-server-camera-home-assistant/
 
-ArRequestHandlerFunction getCameraStream = ([](AsyncWebServerRequest *request) {
-    camera_fb_t *fb = NULL;
-    char *part_buf[64];
+/**
+ * Starts a camera stream in MJPEG format
+ */
+ArRequestHandlerFunction getCameraStream = ([](AsyncWebServerRequest *request)
+                                            {
+                                                AsyncResponseStream* response = request->beginResponseStream(_STREAM_CONTENT_TYPE);
+                                                while (!response->_finished() && request->client()->connected())
+                                                {
+                                                    camera_fb_t *fb = esp_camera_fb_get();
+                                                    if (!fb)
+                                                    {
+                                                        Serial.println("Camera capture failed");
+                                                        break;
+                                                    }
+                                                    response->print(_STREAM_BOUNDARY);
 
-    while (true)
-    {
-        fb = esp_camera_fb_get();
-        if (!fb)
-        {
-            logInfo("Camera capture failed");
-            request->send(500);
-            return;
-        }
-        size_t hlen = snprintf((char *)part_buf, 64, _STREAM_PART, fb->len);
-        size_t allLen = hlen + fb->len + strlen(_STREAM_BOUNDARY);
+                                                    response->printf(_STREAM_PART, fb->len);
+                                                    response->write(fb->buf, fb->len);
+                                                    esp_camera_fb_return(fb);
+                                                    response->print("");
+                                                } });
 
-        AsyncResponseStream *response = request->beginResponseStream(_STREAM_CONTENT_TYPE, allLen);
-
-        response->write((const char *)part_buf, hlen);
-        response->write(fb->buf, fb->len);
-        esp_camera_fb_return(fb);
-        response->write(_STREAM_BOUNDARY, strlen(_STREAM_BOUNDARY));
-        request->send(response);
-    }
-});
-
-ArRequestHandlerFunction getCameraImage = ([](AsyncWebServerRequest *request) {
+ArRequestHandlerFunction getCameraImage = ([](AsyncWebServerRequest *request)
+                                           {
     camera_fb_t *fb = esp_camera_fb_get();
     if (!fb)
     {
@@ -54,11 +49,11 @@ ArRequestHandlerFunction getCameraImage = ([](AsyncWebServerRequest *request) {
         response->write(fb->buf, fb->len);
         request->send(response);
     }
-    esp_camera_fb_return(fb);
-});
+    esp_camera_fb_return(fb); });
 
-ArRequestHandlerFunction setupCamera = ([](AsyncWebServerRequest *request) {
-    StaticJsonDocument<512> response;
+ArRequestHandlerFunction setupCamera = ([](AsyncWebServerRequest *request)
+                                        {
+    JsonDocument response;
     sensor_t *sensor = esp_camera_sensor_get();
     int res = 0;
 
@@ -129,7 +124,6 @@ ArRequestHandlerFunction setupCamera = ([](AsyncWebServerRequest *request) {
     }
     char buffer[512];
     serializeJson(response, buffer);
-    request->send(200, MIME_json, String(buffer));
-});
+    request->send(200, MIME_json, String(buffer)); });
 
 #endif

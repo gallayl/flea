@@ -1,5 +1,5 @@
 import { Injectable, Injector } from '@furystack/inject'
-import { ObservableValue } from '@furystack/utils/dist/observable-value'
+import { ObservableValue } from '@furystack/utils'
 import { ScopedLogger } from '@furystack/logging'
 
 const localStorageKey = 'FLEA_SETTINGS'

@@ -1,17 +1,18 @@
 import { Injector } from '@furystack/inject'
-import { VerboseConsoleLogger } from '@furystack/logging'
+import { useLogging, VerboseConsoleLogger } from '@furystack/logging'
 import { createComponent, initializeShadeRoot } from '@furystack/shades'
 import { EnvironmentService } from './services/environment-service'
 import { Layout } from './components/layout'
+import { useThemeCssVariables, defaultDarkTheme } from '@furystack/shades-common-components'
 
 const shadeInjector = new Injector()
 
-shadeInjector.useLogging(VerboseConsoleLogger)
+useThemeCssVariables(defaultDarkTheme)
+
+useLogging(shadeInjector, VerboseConsoleLogger)
 shadeInjector.setExplicitInstance(
   {
-    nodeEnv: process.env.NODE_ENV as 'development' | 'production',
-    buildDate: new Date(process.env.BUILD_DATE as string),
-    site: process.env.SITE || window.location.host,
+    site: '192.168.0.38', // window.location.host,
   },
   EnvironmentService,
 )

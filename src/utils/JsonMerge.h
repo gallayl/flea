@@ -1,12 +1,12 @@
 #include <ArduinoJson.h>
 
-void merge(JsonVariant dst, JsonVariantConst src)
+void merge(JsonObject dst, JsonVariantConst src)
 {
-  if (src.is<JsonObject>())
+  if (src.is<JsonObjectConst>())
   {
-    for (auto kvp : src.as<JsonObject>())
+    for (auto kvp : src.as<JsonObjectConst>())
     {
-      merge(dst.getOrAddMember(kvp.key()), kvp.value());
+      merge(dst.createNestedObject(kvp.key()), kvp.value());
     }
   }
   else
