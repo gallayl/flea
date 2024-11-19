@@ -1,8 +1,5 @@
 import { AppBar, AppBarLink } from '@furystack/shades-common-components'
-import { Shade, createComponent, Router } from '@furystack/shades'
-import { JoystickPage } from '../pages/joystick-page'
-import { ConsolePage } from '../pages/console-page'
-import { UpdatePage } from '../pages/update-page'
+import { Shade, createComponent, Router, LazyLoad } from '@furystack/shades'
 
 export const Layout = Shade({
   shadowDomName: 'flea-layout',
@@ -32,15 +29,39 @@ export const Layout = Shade({
             routes={[
               {
                 url: '/',
-                component: () => <JoystickPage />,
+                component: () => (
+                  <LazyLoad
+                    component={async () => {
+                      const { JoystickPage } = await import('../pages/joystick-page')
+                      return <JoystickPage />
+                    }}
+                    loader={<></>}
+                  />
+                ),
               },
               {
                 url: '/console',
-                component: () => <ConsolePage />,
+                component: () => (
+                  <LazyLoad
+                    component={async () => {
+                      const { ConsolePage } = await import('../pages/console-page')
+                      return <ConsolePage />
+                    }}
+                    loader={<></>}
+                  />
+                ),
               },
               {
                 url: '/update',
-                component: () => <UpdatePage />,
+                component: () => (
+                  <LazyLoad
+                    component={async () => {
+                      const { UpdatePage } = await import('../pages/update-page')
+                      return <UpdatePage />
+                    }}
+                    loader={<></>}
+                  />
+                ),
               },
             ]}
           />
