@@ -26,7 +26,7 @@ void initWebServer()
 {
     uint8_t port = configJson[CONFIG_HTTP_PORT].as<int>();
 
-    logInfo(F("Starting WEB server on port: ") + String(port));
+    logInfo(F("Starting WEB server"));
 
     server = new AsyncWebServer(port);
 

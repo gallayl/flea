@@ -168,7 +168,11 @@ void WiFiEvent(WiFiEvent_t event)
 void reinitWifiSettings()
 {
 
-    WiFiMode wifiMode = configJson[CONFIG_SOFT_AP_ENABLED].as<bool>() ? WIFI_AP_STA : WIFI_AP;
+#ifdef ESP32
+    wifi_mode_t wifiMode = configJson[CONFIG_SOFT_AP_ENABLED].as<bool>() ? WIFI_AP_STA : WIFI_AP;
+#else
+    WiFiMode_t wifiMode = configJson[CONFIG_SOFT_AP_ENABLED].as<bool>() ? WIFI_AP_STA : WIFI_AP;
+#endif
 
     if (wifiMode == WIFI_AP_STA)
     {
