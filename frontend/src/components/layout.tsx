@@ -14,14 +14,18 @@ export const Layout = Shade({
           flexDirection: 'column',
           lineHeight: '18px',
         }}>
-        <AppBar>
+        <AppBar
+          style={{
+            height: '48px',
+          }}>
           <AppBarLink href="/" style={{ marginRight: '2em' }}>
-            Flea
+            🐜 Flea
           </AppBarLink>
           &nbsp;
-          <AppBarLink href="/">Home</AppBarLink>&nbsp;|&nbsp;
-          <AppBarLink href="/console">Console</AppBarLink>&nbsp;|&nbsp;
-          <AppBarLink href="/update">Update</AppBarLink>
+          <AppBarLink href="/">🏡 Home</AppBarLink>
+          <AppBarLink href="/joystick">🕹️ POV</AppBarLink>
+          <AppBarLink href="/console">⌨️ Console</AppBarLink>
+          <AppBarLink href="/update">⬆️ Update</AppBarLink>
           <div style={{ flex: '1' }} />
         </AppBar>
         <div style={{ width: '100%', height: '100%', flexGrow: '1' }}>
@@ -29,6 +33,18 @@ export const Layout = Shade({
             routes={[
               {
                 url: '/',
+                component: () => (
+                  <LazyLoad
+                    component={async () => {
+                      const { HomePage } = await import('../pages/home-page')
+                      return <HomePage />
+                    }}
+                    loader={<></>}
+                  />
+                ),
+              },
+              {
+                url: '/joystick',
                 component: () => (
                   <LazyLoad
                     component={async () => {

@@ -7,19 +7,14 @@ export const JoystickPage = Shade({
   shadowDomName: 'flea-joystick-page',
   render: ({ injector }) => {
     const movementService = injector.getInstance(MovementService)
+    const env = injector.getInstance(EnvironmentService)
 
     return (
       <div style={{ width: '100%', height: '100%', position: 'relative' }}>
         <img
-          src={`http://${injector.getInstance(EnvironmentService).site}/stream`}
+          src={`http://${env.site}/stream`}
           alt="webcam-image"
           style={{ objectFit: 'cover', width: '100%', height: '100%', zIndex: '-1' }}
-          onerror={(ev) => {
-            const img = (ev as any).target as HTMLImageElement
-            if (img.complete && img.isConnected) {
-              img.src = `http://${injector.getInstance(EnvironmentService).site}/cam?refresh=${Math.random()}`
-            }
-          }}
         />
         <NippleComponent
           style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%' }}

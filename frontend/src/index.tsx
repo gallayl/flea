@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 import { Injector } from '@furystack/inject'
 import { useLogging, VerboseConsoleLogger } from '@furystack/logging'
 import { createComponent, initializeShadeRoot } from '@furystack/shades'
@@ -12,7 +14,7 @@ useThemeCssVariables(defaultDarkTheme)
 useLogging(shadeInjector, VerboseConsoleLogger)
 shadeInjector.setExplicitInstance(
   {
-    site: '192.168.0.38', // window.location.host,
+    site: import.meta.env.VITE_SERVICE_URL || window.location.host,
   },
   EnvironmentService,
 )
