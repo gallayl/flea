@@ -1,10 +1,6 @@
 #pragma once
 
-#ifdef ESP32
-#include <SPIFFS.h>
-#else
-#include <FS.h>
-#endif
+#include <LittleFS.h>
 
 #include "./Logger.h"
 #include "../utils/JsonMerge.h"
@@ -26,7 +22,7 @@
 #define CONFIG_SOFT_AP_SSID "softApSSID"
 #define CONFIG_SOFT_AP_KEY "softApKey"
 
-StaticJsonDocument<CONFIG_SIZE> configJson;
+JsonDocument configJson;
 
 boolean isSaveNeeded = false;
 
@@ -34,11 +30,7 @@ void saveConfigCallback()
 {
     if (isSaveNeeded)
     {
-#ifdef ESP32
-        File configFile = SPIFFS.open(CONFIG_FILE, FILE_WRITE);
-#else
-        File configFile = SPIFFS.open(CONFIG_FILE, "w");
-#endif
+        File configFile = LittleFS.open(CONFIG_FILE, "w");
         if (!configFile)
         {
             logInfo("There was an error writing the config!");
@@ -77,25 +69,17 @@ void initConfig()
 {
     logInfo("Initializing Config...");
     setDefaultConfig();
-#ifdef ESP32
-    if (SPIFFS.begin(true))
-#else
-    if (SPIFFS.begin())
-#endif
+    if (LittleFS.begin())
     {
-        logInfo("SPIFFS not available, config will be the default");
+        logInfo("LittleFS not available, config will be the default");
         return;
     }
     else
     {
-#ifdef ESP32
-        File file = SPIFFS.open(CONFIG_FILE);
-#else
-        File file = SPIFFS.open(CONFIG_FILE, "r");
-#endif
+        File file = LittleFS.open(CONFIG_FILE, "r");
         if (file)
         {
-            StaticJsonDocument<CONFIG_SIZE> fromFile;
+            JsonDocument fromFile;
             DeserializationError error = deserializeJson(fromFile, file.readString());
             switch (error.code())
             {

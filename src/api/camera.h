@@ -89,7 +89,7 @@ ArRequestHandlerFunction setupCamera = ([](AsyncWebServerRequest *request)
             res = sensor->set_wb_mode(sensor, val);
         else if (!variable.compareTo("ae_level"))
             res = sensor->set_ae_level(sensor, val);
-        JsonObject obj = response.createNestedObject(variable);
+        JsonObject obj = response[variable].as<JsonObject>();
         obj["value"] = val;
         obj["response"] = res;
     }

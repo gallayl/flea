@@ -4,10 +4,9 @@
 #include "../CustomCommand.h"
 #include "../../services/Logger.h"
 
-
-CustomCommand *showLogAction = new CustomCommand("showLog", [](String command) {
+CustomCommand *showLogAction = new CustomCommand("showLog", [](String command)
+                                                 {
     char buffer[LOG_BUFFER_LENGTH];
-    StaticJsonDocument<LOG_BUFFER_LENGTH> response = getLogResponse();
+    JsonDocument response = getLogResponse();
     serializeJson(response, buffer);
-    return String(buffer);
-});
+    return String(buffer); });

@@ -9,32 +9,41 @@
 String logBuffer[LOG_ENTRIES];
 int logPointer = 0;
 
-void logInfo(String message) {
-    if (isDisplayAvailable){
+void logInfo(String message)
+{
+    if (isDisplayAvailable)
+    {
         displayInfo(message);
     }
     Serial.println(message);
     logBuffer[logPointer] = message;
-    if (logPointer++ > LOG_ENTRIES){
+    if (logPointer++ > LOG_ENTRIES)
+    {
         logPointer = 0;
     };
 }
 
-StaticJsonDocument<LOG_BUFFER_LENGTH> getLogResponse(){
-    StaticJsonDocument<LOG_BUFFER_LENGTH> response;
+JsonDocument getLogResponse()
+{
+    JsonDocument response;
     response["pointer"] = logPointer;
-    JsonArray entries = response.createNestedArray("entries");
+    JsonArray entries;
     for (int i = logPointer; i < LOG_ENTRIES; i++)
     {
-        if (logBuffer[i] != NULL && logBuffer[i].length() > 0){
+        if (logBuffer[i] != NULL && logBuffer[i].length() > 0)
+        {
             entries.add(logBuffer[i]);
         }
     }
-    for(int i = 0; i < logPointer; i++){
-        if (logBuffer[i] != NULL && logBuffer[i].length() > 0){
+    for (int i = 0; i < logPointer; i++)
+    {
+        if (logBuffer[i] != NULL && logBuffer[i].length() > 0)
+        {
             entries.add(logBuffer[i]);
         }
     }
-    
+
+    response["entries"] = entries;
+
     return response;
 }

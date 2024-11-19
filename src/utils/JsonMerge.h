@@ -4,9 +4,12 @@ void merge(JsonObject dst, JsonVariantConst src)
 {
   if (src.is<JsonObjectConst>())
   {
-    for (auto kvp : src.as<JsonObjectConst>())
+    for (JsonPairConst kvp : src.as<JsonObjectConst>())
     {
-      merge(dst.createNestedObject(kvp.key()), kvp.value());
+      if (dst[kvp.key()])
+        merge(dst[kvp.key()], kvp.value());
+      else
+        dst[kvp.key()] = kvp.value();
     }
   }
   else

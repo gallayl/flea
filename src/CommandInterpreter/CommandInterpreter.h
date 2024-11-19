@@ -2,6 +2,7 @@
 #include "CustomCommand.h"
 #include "CustomCommands/configAction.h"
 #include "CustomCommands/flashlight.h"
+#include "CustomCommands/format.h"
 #include "CustomCommands/i2c.h"
 #include "CustomCommands/info.h"
 #include "CustomCommands/move.h"
@@ -52,7 +53,7 @@ public:
                 return result;
             }
         }
-        return String("{\"message\": \"Unknown command: " + CommandParser::GetCommandName(command) + ".\", \"availableCommands\": \""+this->getAvailableCommands()+"\"}");
+        return String("{\"message\": \"Unknown command: " + CommandParser::GetCommandName(command) + ".\", \"availableCommands\": \"" + this->getAvailableCommands() + "\"}");
     }
 
     CustomCommand RegisteredCommands[COMMANDS_SIZE];
@@ -71,9 +72,10 @@ public:
             ci->RegisterCommand(*showLogAction);
             ci->RegisterCommand(*pwmCommand);
             ci->RegisterCommand(*wifiCommand);
-            #ifdef ESP32
+            ci->RegisterCommand(*formatCommand);
+#ifdef ESP32
             ci->RegisterCommand(*flashlightAction);
-            #endif
+#endif
             instance = ci;
         }
 

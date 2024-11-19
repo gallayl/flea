@@ -5,14 +5,14 @@
 #include "../../hw/Camera.h"
 #include "../../hw/Display.h"
 #include "../../hw/WiFi.h"
-#include "../../services/FtpServer.h"
+#include "../../services/FtpService.h"
 #include <ArduinoJson.h>
+#include <LittleFS.h>
+
 #ifdef ESP32
 #include <WiFi.h>
-#include <SPIFFS.h>
 #else
 #include <ESP8266WiFi.h>
-#include <FS.h>
 #endif
 
 #ifdef ESP32
@@ -47,41 +47,44 @@ String getResetReason()
 }
 #endif
 
+CustomCommand *infoAction = new CustomCommand("info", [](String command)
+                                              {
+    JsonDocument response;
 
-CustomCommand *infoAction = new CustomCommand("info", [](String command) {
-    StaticJsonDocument<512> response;
-
-    JsonObject esp = response.createNestedObject("esp");
+    JsonObject esp = response["esp"].to<JsonObject>();
 
     esp["sdkVersion"] = ESP.getSdkVersion();
     esp["cpuFreqMhz"] = ESP.getCpuFreqMHz();
     esp["freeHeap"] = ESP.getFreeHeap();
     esp["freeSkSpace"] = ESP.getFreeSketchSpace();
 
-    JsonObject flash = response.createNestedObject("flash");
+    JsonObject flash = response["flash"].to<JsonObject>();
 
     flash["mode"] = ESP.getFlashChipMode();
     flash["size"] = ESP.getFlashChipSize();
     flash["speed"] = ESP.getFlashChipSpeed();
 
-    #ifdef ESP32
+#ifdef ESP32
     esp["restartReson"] = getResetReason();
     esp["freePsRam"] = ESP.getFreePsram();
-    JsonObject spiffs = response.createNestedObject("spiffs");
-    spiffs["totalBytes"] = SPIFFS.totalBytes();
-    spiffs["usedBytes"] = SPIFFS.usedBytes();
-    JsonObject camera = response.createNestedObject("camera");
+
+    JsonObject camera = response["camera"].to<JsonObject>();
     sensor_t *sensor = esp_camera_sensor_get();
     camera["framesize"] = sensor->status.framesize;
     camera["quality"] = sensor->status.quality;
     camera["errorCode"] = cameraErrorCode;
-    #endif
     
-    JsonObject status = response.createNestedObject("status");
+
+    JsonObject littleFs = response["littleFs"].to<JsonObject>();
+    littleFs["totalBytes"] = LittleFS.totalBytes();
+    littleFs["usedBytes"] = LittleFS.usedBytes();
+
+#endif
+
+    JsonObject status = response["status"].to<JsonObject>();
     status["isSdAvailable"] = isStorageAvailable;
     status["isDisplayAvailable"] = isDisplayAvailable;
 
     char buffer[512];
     serializeJson(response, buffer);
-    return String(buffer);
-});
+    return String(buffer); });

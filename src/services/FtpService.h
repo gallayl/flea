@@ -1,12 +1,10 @@
 #pragma once
 
-#include <ESP8266FtpServer.h>
-#ifdef ESP32
-#include "SPIFFS.h"
-#else
 #include "FS.h"
-#endif
+#include "LittleFS.h"
 #include "./Logger.h"
+
+#include <SimpleFTPServer.h>
 
 #define FTP_USER "admin"
 #define FTP_PASS "admin"
@@ -19,11 +17,12 @@ void initFtpServer()
 {
     logInfo("Setting up FTP Server...");
 #ifdef ESP32
-    if (SPIFFS.begin(true))
+    if (LittleFS.begin(true))
 #else
-    if (SPIFFS.begin())
+    if (LittleFS.begin())
 #endif
     {
+        ftpSrv.setLocalIp(WiFi.localIP());
         ftpSrv.begin(FTP_USER, FTP_PASS);
         isStorageAvailable = true;
     }

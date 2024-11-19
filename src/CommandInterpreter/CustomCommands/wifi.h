@@ -3,7 +3,7 @@
 #include <ArduinoJson.h>
 #ifdef ESP32
 #include <WiFi.h>
-#else 
+#else
 #include <ESP8266WiFi.h>
 #endif
 #include <IPAddress.h>
@@ -13,7 +13,8 @@
 #include "../CommandParser.h"
 #include "../CustomCommand.h"
 
-CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command) {
+CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command)
+                                               {
     String operation = CommandParser::GetCommandParameter(command, 1);
     if (!operation.compareTo("connect"))
     {
@@ -28,15 +29,15 @@ CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command) {
     }
     if (!operation.compareTo("list"))
     {
-        StaticJsonDocument<512> response;
-        JsonArray networks = response.createNestedArray("networks");
+        JsonDocument response;
+        JsonArray networks = response["networks"].as<JsonArray>();
 
         int n = WiFi.scanNetworks();
         networks.begin();
 
         for (int i = 0; i < n; ++i)
         {
-            JsonObject element = networks.createNestedObject();
+            JsonObject element;
             element["ssid"] = WiFi.SSID(i);
             element["rssi"] = WiFi.RSSI(i);
             element["rssiText"] = getSignalStrength(WiFi.RSSI(i));
@@ -73,10 +74,10 @@ CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command) {
 
     if (!operation.compareTo("info"))
     {
-        StaticJsonDocument<512> response;
+        JsonDocument response;
         if (WiFi.getMode() == WIFI_AP || WiFi.getMode() == WIFI_AP_STA)
         {
-            JsonObject ap = response.createNestedObject("ap");
+            JsonObject ap = response["ap"].to<JsonObject>();
             ap["ipAddress"] = WiFi.localIP().toString();
             ap["macAddress"] = WiFi.macAddress();
             ap["ssid"] = WiFi.SSID();
@@ -85,12 +86,13 @@ CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command) {
 
         if (WiFi.getMode() == WIFI_STA || WiFi.getMode() == WIFI_AP_STA)
         {
-            JsonObject sta = response.createNestedObject("sta");
+            JsonObject sta = response["sta"].to<JsonObject>();
             sta["ipAddress"] = WiFi.softAPIP().toString();
             sta["gateway"] = configJson[CONFIG_SOFT_AP_GATEWAY];
             sta["netmask"] = configJson[CONFIG_SOFT_AP_NETMASK];
             sta["macAddress"] = WiFi.softAPmacAddress();
             sta["ssid"] = configJson[CONFIG_SOFT_AP_SSID];
+
         }
 
         int32_t rssi = WiFi.RSSI();
@@ -101,5 +103,4 @@ CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command) {
         serializeJson(response, buffer);
         return String(buffer);
     }
-    return String("{\"event\": \"Unknown WiFi operation command. The available commands are: info, list, connect <ssid> <password>, startSTA<ssid, password>, stopSTA\"}");
-});
+    return String("{\"event\": \"Unknown WiFi operation command. The available commands are: info, list, connect <ssid> <password>, startSTA<ssid, password>, stopSTA\"}"); });

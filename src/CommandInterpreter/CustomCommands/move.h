@@ -6,8 +6,9 @@
 
 #define MOTOR_COMM
 
-CustomCommand *moveAction = new CustomCommand("move", [](String fullCommand) {
-    StaticJsonDocument<128> response;
+CustomCommand *moveAction = new CustomCommand("move", [](String fullCommand)
+                                              {
+    JsonDocument response;
 
     String param1 = CommandParser::GetCommandParameter(fullCommand, 1);
     if (param1.compareTo("stop") == 0)
@@ -27,5 +28,4 @@ CustomCommand *moveAction = new CustomCommand("move", [](String fullCommand) {
 
     char buffer[128];
     serializeJson(response, buffer);
-    return String(buffer);
-});
+    return String(buffer); });
