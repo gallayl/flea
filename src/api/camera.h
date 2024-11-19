@@ -4,6 +4,8 @@
 
 #include "../mime.h"
 #include "../hw/Camera.h"
+#include <esp32cam-asyncweb.h>
+#include <ESPAsyncWebServer.h>
 
 #define PART_BOUNDARY "frame"
 
@@ -16,40 +18,9 @@ static const char *_STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %
 /**
  * Starts a camera stream in MJPEG format
  */
-ArRequestHandlerFunction getCameraStream = ([](AsyncWebServerRequest *request)
-                                            {
-                                                AsyncResponseStream* response = request->beginResponseStream(_STREAM_CONTENT_TYPE);
-                                                while (!response->_finished() && request->client()->connected())
-                                                {
-                                                    camera_fb_t *fb = esp_camera_fb_get();
-                                                    if (!fb)
-                                                    {
-                                                        Serial.println("Camera capture failed");
-                                                        break;
-                                                    }
-                                                    response->print(_STREAM_BOUNDARY);
+ArRequestHandlerFunction getCameraStream = esp32cam::asyncweb::handleMjpeg;
 
-                                                    response->printf(_STREAM_PART, fb->len);
-                                                    response->write(fb->buf, fb->len);
-                                                    esp_camera_fb_return(fb);
-                                                    response->print("");
-                                                } });
-
-ArRequestHandlerFunction getCameraImage = ([](AsyncWebServerRequest *request)
-                                           {
-    camera_fb_t *fb = esp_camera_fb_get();
-    if (!fb)
-    {
-        request->send(500, MIME_plainText, "Camera capture failed");
-    }
-    else
-    {
-
-        AsyncResponseStream *response = request->beginResponseStream(MIME_jpeg, fb->len);
-        response->write(fb->buf, fb->len);
-        request->send(response);
-    }
-    esp_camera_fb_return(fb); });
+ArRequestHandlerFunction getCameraImage = esp32cam::asyncweb::handleStill;
 
 ArRequestHandlerFunction setupCamera = ([](AsyncWebServerRequest *request)
                                         {
