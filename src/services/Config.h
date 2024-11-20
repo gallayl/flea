@@ -28,11 +28,11 @@ void saveConfigFile()
     File configFile = LittleFS.open(CONFIG_FILE, "w");
     if (!configFile)
     {
-        Logger::GetInstance()->Error(F("There was an error writing the config!"));
+        LoggerInstance->Error(F("There was an error writing the config!"));
     }
     serializeJsonPretty(configJson, configFile);
     configFile.close();
-    Logger::GetInstance()->Info(F("Config saved."));
+    LoggerInstance->Info(F("Config saved."));
 }
 
 void setDefaultConfig()
@@ -51,7 +51,7 @@ void setDefaultConfig()
 
 void initConfig()
 {
-    Logger::GetInstance()->Info(F("Initializing Config..."));
+    LoggerInstance->Info(F("Initializing Config..."));
     setDefaultConfig();
 
 #ifdef ESP32
@@ -60,7 +60,7 @@ void initConfig()
     if (!LittleFS.begin())
 #endif
     {
-        Logger::GetInstance()->Info(F("LittleFS not available, config will be the default"));
+        LoggerInstance->Info(F("LittleFS not available, config will be the default"));
         return;
     }
     else
@@ -73,23 +73,23 @@ void initConfig()
             switch (error.code())
             {
             case DeserializationError::Ok:
-                Logger::GetInstance()->Info(F("Config file loaded succesfully."));
+                LoggerInstance->Info(F("Config file loaded succesfully."));
                 merge(configJson.as<JsonVariant>(), fromFile.as<JsonVariantConst>());
                 break;
             case DeserializationError::InvalidInput:
-                Logger::GetInstance()->Error(F("Invalid input!"));
+                LoggerInstance->Error(F("Invalid input!"));
                 break;
             case DeserializationError::NoMemory:
-                Logger::GetInstance()->Error(F("Not enough memory"));
+                LoggerInstance->Error(F("Not enough memory"));
                 break;
             default:
-                Logger::GetInstance()->Error(F("Deserialization failed"));
+                LoggerInstance->Error(F("Deserialization failed"));
                 break;
             }
         }
         else
         {
-            Logger::GetInstance()->Info("No config file, using defaults.");
+            LoggerInstance->Info("No config file, using defaults.");
         }
     }
 }

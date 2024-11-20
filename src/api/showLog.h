@@ -6,7 +6,7 @@
 
 ArRequestHandlerFunction showLog = ([](AsyncWebServerRequest *request)
                                     {
-                                          JsonDocument response = Logger::GetInstance()->getEntries();
+                                          JsonDocument response = LoggerInstance->getEntries();
                                           String responseStr;
                                           serializeJson(response, responseStr);
                                           request->send(200, MIME_json, responseStr); });

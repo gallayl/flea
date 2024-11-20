@@ -15,6 +15,11 @@ public:
         return this->_onSetup();
     }
 
+    void Loop()
+    {
+        return this->_onLoop();
+    }
+
     String GetFeatureName()
     {
         return this->_featureName;

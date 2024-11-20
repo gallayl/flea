@@ -10,6 +10,7 @@
 #include <WiFiClientSecure.h>
 
 #include "../FeatureRegistry/Features/Logging.h"
+#include "../FeatureRegistry/Features/configCustomCommand.h"
 
 String getSignalStrength(int32_t rssi)
 {
@@ -85,79 +86,79 @@ void WiFiEvent(WiFiEvent_t event)
     switch (event)
     {
     case SYSTEM_EVENT_WIFI_READY:
-        Logger::GetInstance()->Info(F("WiFi interface ready"));
+        LoggerInstance->Info(F("WiFi interface ready"));
         break;
     case SYSTEM_EVENT_SCAN_DONE:
-        Logger::GetInstance()->Info(F("Completed scan for access points"));
+        LoggerInstance->Info(F("Completed scan for access points"));
         break;
     case SYSTEM_EVENT_STA_START:
-        Logger::GetInstance()->Info(F("WiFi client started"));
+        LoggerInstance->Info(F("WiFi client started"));
         break;
     case SYSTEM_EVENT_STA_STOP:
-        Logger::GetInstance()->Info(F("WiFi clients stopped"));
+        LoggerInstance->Info(F("WiFi clients stopped"));
         break;
     case SYSTEM_EVENT_STA_CONNECTED:
-        Logger::GetInstance()->Info(F("Connected to access point"));
+        LoggerInstance->Info(F("Connected to access point"));
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
-        Logger::GetInstance()->Info(F("Disconnected from WiFi access point"));
+        LoggerInstance->Info(F("Disconnected from WiFi access point"));
         break;
     case SYSTEM_EVENT_STA_AUTHMODE_CHANGE:
-        Logger::GetInstance()->Info(F("Authentication mode of access point has changed"));
+        LoggerInstance->Info(F("Authentication mode of access point has changed"));
         break;
     case SYSTEM_EVENT_STA_GOT_IP:
-        Logger::GetInstance()->Info("Obtained IP address: " + WiFi.localIP().toString());
+        LoggerInstance->Info("Obtained IP address: " + WiFi.localIP().toString());
         break;
     case SYSTEM_EVENT_STA_LOST_IP:
-        Logger::GetInstance()->Info(F("Lost IP address and IP address is reset to 0"));
+        LoggerInstance->Info(F("Lost IP address and IP address is reset to 0"));
         break;
     case SYSTEM_EVENT_STA_WPS_ER_SUCCESS:
-        Logger::GetInstance()->Info(F("WiFi Protected Setup (WPS): succeeded in enrollee mode"));
+        LoggerInstance->Info(F("WiFi Protected Setup (WPS): succeeded in enrollee mode"));
         break;
     case SYSTEM_EVENT_STA_WPS_ER_FAILED:
-        Logger::GetInstance()->Info(F("WiFi Protected Setup (WPS): failed in enrollee mode"));
+        LoggerInstance->Info(F("WiFi Protected Setup (WPS): failed in enrollee mode"));
         break;
     case SYSTEM_EVENT_STA_WPS_ER_TIMEOUT:
-        Logger::GetInstance()->Info(F("WiFi Protected Setup (WPS): timeout in enrollee mode"));
+        LoggerInstance->Info(F("WiFi Protected Setup (WPS): timeout in enrollee mode"));
         break;
     case SYSTEM_EVENT_STA_WPS_ER_PIN:
-        Logger::GetInstance()->Info(F("WiFi Protected Setup (WPS): pin code in enrollee mode"));
+        LoggerInstance->Info(F("WiFi Protected Setup (WPS): pin code in enrollee mode"));
         break;
     case SYSTEM_EVENT_AP_START:
-        Logger::GetInstance()->Info(F("WiFi access point started"));
+        LoggerInstance->Info(F("WiFi access point started"));
         break;
     case SYSTEM_EVENT_AP_STOP:
-        Logger::GetInstance()->Info(F("WiFi access point  stopped"));
+        LoggerInstance->Info(F("WiFi access point  stopped"));
         break;
     case SYSTEM_EVENT_AP_STACONNECTED:
-        Logger::GetInstance()->Info(F("Client connected"));
+        LoggerInstance->Info(F("Client connected"));
         break;
     case SYSTEM_EVENT_AP_STADISCONNECTED:
-        Logger::GetInstance()->Info(F("Client disconnected"));
+        LoggerInstance->Info(F("Client disconnected"));
         break;
     case SYSTEM_EVENT_AP_STAIPASSIGNED:
-        Logger::GetInstance()->Info(F("Assigned IP address to client"));
+        LoggerInstance->Info(F("Assigned IP address to client"));
         break;
     case SYSTEM_EVENT_AP_PROBEREQRECVED:
-        Logger::GetInstance()->Info(F("Received probe request"));
+        LoggerInstance->Info(F("Received probe request"));
         break;
     case SYSTEM_EVENT_GOT_IP6:
-        Logger::GetInstance()->Info(F("IPv6 is preferred"));
+        LoggerInstance->Info(F("IPv6 is preferred"));
         break;
     case SYSTEM_EVENT_ETH_START:
-        Logger::GetInstance()->Info(F("Ethernet started"));
+        LoggerInstance->Info(F("Ethernet started"));
         break;
     case SYSTEM_EVENT_ETH_STOP:
-        Logger::GetInstance()->Info(F("Ethernet stopped"));
+        LoggerInstance->Info(F("Ethernet stopped"));
         break;
     case SYSTEM_EVENT_ETH_CONNECTED:
-        Logger::GetInstance()->Info(F("Ethernet connected"));
+        LoggerInstance->Info(F("Ethernet connected"));
         break;
     case SYSTEM_EVENT_ETH_DISCONNECTED:
-        Logger::GetInstance()->Info(F("Ethernet disconnected"));
+        LoggerInstance->Info(F("Ethernet disconnected"));
         break;
     case SYSTEM_EVENT_ETH_GOT_IP:
-        Logger::GetInstance()->Info(F("Obtained IP address"));
+        LoggerInstance->Info(F("Obtained IP address"));
         break;
     default:
         break;

@@ -1,10 +1,11 @@
 #pragma once
 
-#include "../CommandParser.h"
-#include "../CustomCommand.h"
+
+#include "../../CommandInterpreter/CommandParser.h"
+#include "../../CommandInterpreter/CustomCommand.h"
 #include "../../services/Config.h"
 
-CustomCommand *configAction = new CustomCommand("config", [](String command) {
+CustomCommand *configCustomCommand = new CustomCommand("config", [](String command) {
     String operation = CommandParser::GetCommandParameter(command, 1);
 
     if (!operation.compareTo("reload"))

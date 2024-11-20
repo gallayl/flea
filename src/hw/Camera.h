@@ -1,8 +1,10 @@
 #pragma once
 
+#include "../FeatureRegistry/Features/Logging.h"
+
 #ifdef ESP32
 
-#include "../FeatureRegistry/Features/Logging.h"
+
 #include <esp_camera.h>
 
 #define PWDN_GPIO_NUM 32
@@ -28,7 +30,7 @@ esp_err_t cameraErrorCode = 0;
 
 void initCamera()
 {
-    Logger::GetInstance()->Info(F("Initializing Camera..."));
+    LoggerInstance->Info(F("Initializing Camera..."));
     camera_config_t config;
     config.ledc_channel = LEDC_CHANNEL_0;
     config.ledc_timer = LEDC_TIMER_0;
@@ -58,14 +60,14 @@ void initCamera()
 
     if (cameraErrorCode != ESP_OK)
     {
-        Logger::GetInstance()->Error(String("Warning: Cam init failed with error 0x" + String(cameraErrorCode)));
+        LoggerInstance->Error(String("Warning: Cam init failed with error 0x" + String(cameraErrorCode)));
     }
     isCameraAvailable = true;
-    Logger::GetInstance()->Info(F("Cam initialized."));
+    LoggerInstance->Info(F("Cam initialized."));
 }
 #else
 void initCamera()
 {
-    Logger::GetInstance()->Info(F("Camera not supported, skipping init..."));
+    LoggerInstance->Info(F("Camera not supported, skipping init..."));
 }
 #endif

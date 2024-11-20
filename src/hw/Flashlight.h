@@ -9,7 +9,7 @@
 #ifdef ESP32
 
 void initFlashlight() {
-    Logger::GetInstance()->Info(F("Initializing Flashlight..."));
+    LoggerInstance->Info(F("Initializing Flashlight..."));
     ledcSetup(FLASH_PWM_CHANNEL,5000,8);
     ledcAttachPin(FLASH_PIN, FLASH_PWM_CHANNEL);
 }

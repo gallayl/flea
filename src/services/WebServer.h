@@ -26,7 +26,7 @@ void initWebServer()
 {
     uint8_t port = configJson[CONFIG_HTTP_PORT].as<int>();
 
-    Logger::GetInstance()->Info(F("Starting WEB server"));
+    LoggerInstance->Info(F("Starting WEB server"));
 
     server = new AsyncWebServer(port);
 
@@ -53,11 +53,11 @@ void initWebServer()
 
     server->onNotFound([](AsyncWebServerRequest *req)
                        {
-                        Logger::GetInstance()->Info("Not found: " + req->url());
+                        LoggerInstance->Info("Not found: " + req->url());
         AsyncWebServerResponse *response = req->beginResponse(LittleFS, "/index.html", "text/html; charset=UTF-8");
         req->send(response); });
 
     server->begin();
 
-    Logger::GetInstance()->Info(F("Server setup done."));
+    LoggerInstance->Info(F("Server setup done."));
 }

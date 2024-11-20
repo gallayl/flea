@@ -10,8 +10,8 @@
 
 #include "../../hw/WiFi.h"
 
-#include "../CommandParser.h"
-#include "../CustomCommand.h"
+#include "../../CommandInterpreter/CommandParser.h"
+#include "../../CommandInterpreter/CustomCommand.h"
 
 CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command)
                                                {

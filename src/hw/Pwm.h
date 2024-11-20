@@ -11,7 +11,7 @@
 Adafruit_PWMServoDriver pwm;
 
 void initPwm() {
-    Logger::GetInstance()->Info(F("Initializing PWM..."));
+    LoggerInstance->Info(F("Initializing PWM..."));
     pwm.begin(B000000);
 }
 

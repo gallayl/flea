@@ -20,7 +20,7 @@ ArUploadHandlerFunction uploadFiles = ([](AsyncWebServerRequest *request, String
 
         if (!file)
         {
-            Logger::GetInstance()->Error("Failed to open file for writing");
+            LoggerInstance->Error("Failed to open file for writing");
             request->send(500, MIME_json, "{\"error\":\"Failed to open file for writing\"}");
             return;
         }
@@ -29,6 +29,6 @@ ArUploadHandlerFunction uploadFiles = ([](AsyncWebServerRequest *request, String
 
     if (final)
     {
-        Logger::GetInstance()->Info("Upload finished");
+        LoggerInstance->Info("Upload finished");
         request->send(200, MIME_json, "{\"status\":\"ok\"}");
     }; });

@@ -2,6 +2,8 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include "../Feature.h"
+#include "../../CommandInterpreter/CustomCommand.h"
+#include "../../CommandInterpreter/CommandInterpreter.h"
 
 typedef void (*LogListener)(String, String);
 
@@ -10,14 +12,6 @@ typedef void (*LogListener)(String, String);
 class Logger
 {
 public:
-    static Logger *GetInstance()
-    {
-        if (instance == nullptr)
-        {
-            instance = new Logger();
-        }
-        return instance;
-    }
 
     JsonArray getEntries()
     {
@@ -45,8 +39,13 @@ public:
         this->listenersCount++;
     }
 
+    Logger() {
+        this->entries = JsonArray();
+        this->listenersCount = 0;
+    }
+
+
 private:
-    static Logger *instance;
 
     JsonArray entries;
 
@@ -59,6 +58,10 @@ private:
         Serial.print(severity);
         Serial.print(F(": "));
         Serial.println(message);
+        for (byte i = 0; i < this->listenersCount; i++)
+        {
+            this->listeners[i](severity, message);
+        }
     }
 
     void addEntry(String severity, String message)
@@ -68,12 +71,20 @@ private:
         entry["message"] = message;
     }
 
-    Logger() {}
 };
 
-Logger *Logger::instance = nullptr;
+Logger *LoggerInstance = new Logger();
 
-Feature *Logging = new Feature("Logging", []()
-                               { Logger::GetInstance(); }, []() {});
+#define LOG_BUFFER_LENGTH 1024
+
+CustomCommand *showLogAction = new CustomCommand("showLog", [](String command)
+                                                 {
+    char buffer[LOG_BUFFER_LENGTH];
+    JsonDocument response = LoggerInstance->getEntries();
+    serializeJson(response, buffer);
+    return String(buffer); });
 
 
+Feature *LoggingFeature = new Feature("Logging", []()                               {
+    // CommandInterpreterInstance->RegisterCommand(*showLogAction);
+                                }, []() {});

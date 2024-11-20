@@ -4,14 +4,13 @@
 #include "../../CommandInterpreter/CommandInterpreter.h"
 
 
-Feature *SerialRead = new Feature("SerialRead", []() {}, []()
+Feature *SerialReadFeature = new Feature("SerialRead", []() {}, []()
                                   {
     if (Serial.available())
     {
         String command = Serial.readStringUntil('\n');
         command.replace("\n", "");
         command.replace("\r", "");
-        // TODO
-        String response = CommandInterpreter::GetInstance()->ExecuteCommand(command);
+        String response = CommandInterpreterInstance->ExecuteCommand(command);
         Serial.println(response);
     } });

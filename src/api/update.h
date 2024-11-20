@@ -24,7 +24,7 @@ ArUploadHandlerFunction onUploadUpdate = ([](AsyncWebServerRequest *request, Str
         
         if (!Update.begin(request->contentLength(), U_FLASH))
         {
-            Logger::GetInstance()->Error(String("Update failed with error" + Update.getError()));
+            LoggerInstance->Error(String("Update failed with error" + Update.getError()));
             Update.printError(Serial);
         }
     }
@@ -42,7 +42,7 @@ ArUploadHandlerFunction onUploadUpdate = ([](AsyncWebServerRequest *request, Str
             AsyncWebServerResponse *response = request->beginResponse(200, "text/html", "<html><head><meta http-equiv=\"refresh\" content=\"5\"></head><body>Update done, page will be refreshed.</body></html>");
             response->addHeader("Refresh", "5");
             request->send(response);
-            Logger::GetInstance()->Info("Update finished, will restart...");
+            LoggerInstance->Info("Update finished, will restart...");
             delay(300);
             ESP.restart();
         }

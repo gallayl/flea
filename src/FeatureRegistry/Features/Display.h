@@ -1,4 +1,7 @@
 #pragma once 
+#include "../../CommandInterpreter/CommandInterpreter.h"
+#include "../../CommandInterpreter/CustomCommand.h"
+#include "../../CommandInterpreter/CommandParser.h"
 #include "../Feature.h"
 #include "../FeatureRegistry.h"
 #include "./Logging.h"
@@ -17,13 +20,20 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 bool isDisplayAvailable = false;
 
+CustomCommand *displayCommand = new CustomCommand("display", [](String command) {
+    String operation = CommandParser::GetCommandParameter(command, 1);
+    return String(F("Not implemented"));
+});
+
 Feature* DisplayFeature = new Feature("Display", []() {
     isDisplayAvailable = display.begin(SSD1306_SWITCHCAPVCC, 0x3c);
     display.dim(false);
     display.setTextSize(1);      // Normal 1:1 pixel scale
     display.setTextColor(WHITE); // Draw white text
 
-    Logger::GetInstance()->AddListener([](String severity, String message) {
+    CommandInterpreterInstance->RegisterCommand(*displayCommand);
+
+    LoggerInstance->AddListener([](String severity, String message) {
     display.dim(false);
     display.clearDisplay();
     display.setCursor(0, 0);
@@ -34,4 +44,5 @@ Feature* DisplayFeature = new Feature("Display", []() {
 }, []() {
     
 });
+
 

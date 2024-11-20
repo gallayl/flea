@@ -1,8 +1,16 @@
 #pragma once
-#include "./Feature.h"
 
+
+#define ENABLE_I2C_DISPLAY false
+
+#include "./Feature.h"
 #include "./Features/Logging.h"
+#include "./Features/SystemUtils.h"
+
+#if ENABLE_I2C_DISPLAY
 #include "./Features/Display.h"
+#endif
+
 #include "./Features/SerialRead.h"
 
 #define FEATURES_SIZE 128
@@ -10,58 +18,64 @@
 class FeatureRegistry
 {
 private:
-    static FeatureRegistry *instance;
 
     String _featureNames[FEATURES_SIZE];
 
     uint8_t _registeredFeaturesCount = 0;
 
-    FeatureRegistry()
-    {
-    }
 
 public:
+
+    FeatureRegistry()
+    {
+        this->RegisterFeature(*LoggingFeature);
+        this->RegisterFeature(*SystemFeatures);
+#if ENABLE_I2C_DISPLAY
+        this->RegisterFeature(*DisplayFeature);
+#endif
+        this->RegisterFeature(*SerialReadFeature);
+    }
+
 
     void RegisterFeature(Feature newCommand)
     {
         this->RegisteredFeatures[this->_registeredFeaturesCount] = newCommand;
         this->_registeredFeaturesCount++;
-
-        Logger::GetInstance()->Info("Registered feature: " + newCommand.GetFeatureName());
     }
 
     /**
      * TODO: Check if its OK
      */
-    String *GetFeatureNames()
+    JsonArray GetFeaturesArray()
     {
-        return this->_featureNames;
+        JsonArray response = JsonArray();
+        for (uint8_t i = 0; i < this->_registeredFeaturesCount; i++)
+        {
+            response.add(this->RegisteredFeatures[i].GetFeatureName());
+        }
+
+        return response;
     }
 
     void SetupFeatures()
     {
         for (uint8_t i = 0; i < this->_registeredFeaturesCount; i++)
         {
+            LoggerInstance->Info("Setting up feature: " + this->RegisteredFeatures[i].GetFeatureName());
             this->RegisteredFeatures[i].Setup();
+        }
+    }
+
+    void LoopFeatures()
+    {
+        for (uint8_t i = 0; i < this->_registeredFeaturesCount; i++)
+        {
+            this->RegisteredFeatures[i].Loop();
         }
     }
 
     Feature RegisteredFeatures[FEATURES_SIZE];
 
-    static FeatureRegistry *GetInstance()
-    {
-        if (instance == nullptr)
-        {
-            FeatureRegistry *createdInstance = new FeatureRegistry();
-            instance = createdInstance;
-            createdInstance->RegisterFeature(*Logging);
-            createdInstance->RegisterFeature(*DisplayFeature);
-            createdInstance->RegisterFeature(*SerialRead);
-        }
-
-        return instance;
-    }
-    
 };
 
-FeatureRegistry *FeatureRegistry::instance = nullptr;
+FeatureRegistry *FeatureRegistryInstance = new FeatureRegistry();

@@ -1,5 +1,5 @@
-#include "CommandInterpreter/CommandInterpreter.h"
 #include <Wire.h>
+#include "./CommandInterpreter/CommandInterpreter.h"
 #include "./services/Config.h"
 #include "./services/WebServer.h"
 #include "./services/WebSocketServer.h"
@@ -14,13 +14,13 @@ int16_t steerValue = 0;
 
 void setup()
 {
+    Serial.begin(9600);
 #ifdef ESP32
     Wire.begin(GPIO_NUM_14, GPIO_NUM_15);
 #else
     Wire.begin();
 #endif
     initPwm();
-    Serial.begin(9600);
     initConfig();
     initWifi();
     initWebServer();
@@ -30,7 +30,7 @@ void setup()
     initCamera();
 #endif
 
-    FeatureRegistry::GetInstance()->SetupFeatures();
+    FeatureRegistryInstance->SetupFeatures();
 
 }
 
@@ -41,7 +41,7 @@ void loop()
         String command = Serial.readStringUntil('\n');
         command.replace("\n", "");
         command.replace("\r", "");
-        String response = CommandInterpreter::GetInstance()->ExecuteCommand(command);
+        String response = CommandInterpreterInstance->ExecuteCommand(command);
         Serial.println(response);
     }
 }

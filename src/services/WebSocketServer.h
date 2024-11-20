@@ -24,16 +24,16 @@ void initWebSockets()
         if (type == WS_EVT_CONNECT)
         {
             client->text("Connected to Rover ESP32");
-            Logger::GetInstance()->Info(String("WS connected: " + client->remoteIP().toString()));
+            LoggerInstance->Info(String("WS connected: " + client->remoteIP().toString()));
         }
         else if (type == WS_EVT_DISCONNECT)
         {
-            Logger::GetInstance()->Info(String("WS left: " + client->remoteIP().toString()));
+            LoggerInstance->Info(String("WS left: " + client->remoteIP().toString()));
         }
         else if (type == WS_EVT_DATA)
         {
             String str = String((char *)data).substring(0, len);
-            String response = CommandInterpreter::GetInstance()->ExecuteCommand(str);
+            String response = CommandInterpreterInstance->ExecuteCommand(str);
             server->textAll(response);
         } });
 
