@@ -8,10 +8,11 @@ export const UpdatePage = Shade({
       <div style={{ display: 'flex', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
         <form
           style={{ display: 'flex', flexDirection: 'column' }}
-          action={'http://' + injector.getInstance(EnvironmentService).site + '/update'}
+          action={`http://${injector.getInstance(EnvironmentService).site}/update`}
           accept="application/octet-stream"
           enctype="multipart/form-data"
-          {...({ method: 'POST' } as any)}>
+          {...({ method: 'POST' } as any)}
+        >
           <div>
             <input type="file" name="update" style={{ margin: '2em' }} accept="application/octet-stream" />
             <input type="submit" value="Update" />

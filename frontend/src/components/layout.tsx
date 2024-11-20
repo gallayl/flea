@@ -13,11 +13,13 @@ export const Layout = Shade({
           display: 'flex',
           flexDirection: 'column',
           lineHeight: '18px',
-        }}>
+        }}
+      >
         <AppBar
           style={{
             height: '48px',
-          }}>
+          }}
+        >
           <AppBarLink href="/" style={{ marginRight: '2em' }}>
             🐜 Flea
           </AppBarLink>

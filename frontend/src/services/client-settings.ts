@@ -1,6 +1,6 @@
-import { Injectable, Injector } from '@furystack/inject'
+import { Injectable, Injected } from '@furystack/inject'
+import { getLogger, type ScopedLogger } from '@furystack/logging'
 import { ObservableValue } from '@furystack/utils'
-import { ScopedLogger } from '@furystack/logging'
 
 const localStorageKey = 'FLEA_SETTINGS'
 
@@ -18,21 +18,17 @@ export class ClientSettings {
     steerSensitivity: 32,
   })
 
-  logger: ScopedLogger
+  @Injected((i) => getLogger(i).withScope('ClientSettings'))
+  declare logger: ScopedLogger
 
-  private initConfig() {
+  public init() {
     const settings = localStorage.getItem(localStorageKey)
     try {
-      const value = JSON.parse(settings || '')
+      const value = JSON.parse(settings || '') as Partial<ClientSettingsValues>
       this.currentSettings.setValue({ ...this.currentSettings.getValue(), ...value })
     } catch (error) {
-      this.logger.warning({ message: 'Failed to parse stored settings. Resetting to defaults...' })
+      void this.logger.warning({ message: 'Failed to parse stored settings. Resetting to defaults...' })
       localStorage.removeItem(localStorageKey)
     }
-  }
-
-  constructor(injector: Injector) {
-    this.logger = injector.logger.withScope('ClientSettings')
-    this.initConfig()
   }
 }

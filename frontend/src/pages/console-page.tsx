@@ -1,7 +1,7 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Button } from '@furystack/shades-common-components'
-import { WebSocketService } from '../services/websocket-service'
 import { ObservableValue } from '@furystack/utils'
+import { WebSocketService } from '../services/websocket-service'
 
 export const ConsoleEntryList = Shade({
   shadowDomName: 'flea-console-entries',
@@ -13,7 +13,7 @@ export const ConsoleEntryList = Shade({
     )
   },
   render: ({ injector, useObservable }) => {
-    const [] = useObservable('lastMessage', injector.getInstance(WebSocketService).lastMessage)
+    const [_lastMessage] = useObservable('lastMessage', injector.getInstance(WebSocketService).lastMessage)
 
     return (
       <div style={{ marginTop: '32px' }}>

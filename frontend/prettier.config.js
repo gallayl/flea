@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
   jsxBracketSameLine: true,
   printWidth: 120,
   semi: false,
@@ -7,3 +7,5 @@ module.exports = {
   endOfLine: 'auto',
   arrowParens: 'always',
 }
+
+export default config
