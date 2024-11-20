@@ -1,7 +1,6 @@
 #include "CommandInterpreter/CommandInterpreter.h"
 #include <Wire.h>
 #include "./services/Config.h"
-#include "./services/Logger.h"
 #include "./services/WebServer.h"
 #include "./services/WebSocketServer.h"
 #include "./hw/Camera.h"
@@ -23,7 +22,6 @@ void setup()
     initPwm();
     Serial.begin(9600);
     initConfig();
-    initDisplay();
     initWifi();
     initWebServer();
     initWebSockets();
@@ -31,6 +29,9 @@ void setup()
     initFlashlight();
     initCamera();
 #endif
+
+    FeatureRegistry::GetInstance()->SetupFeatures();
+
 }
 
 void loop()

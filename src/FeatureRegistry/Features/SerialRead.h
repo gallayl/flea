@@ -3,6 +3,7 @@
 #include "../Feature.h"
 #include "../../CommandInterpreter/CommandInterpreter.h"
 
+
 Feature *SerialRead = new Feature("SerialRead", []() {}, []()
                                   {
     if (Serial.available())
@@ -10,6 +11,7 @@ Feature *SerialRead = new Feature("SerialRead", []() {}, []()
         String command = Serial.readStringUntil('\n');
         command.replace("\n", "");
         command.replace("\r", "");
+        // TODO
         String response = CommandInterpreter::GetInstance()->ExecuteCommand(command);
         Serial.println(response);
     } });

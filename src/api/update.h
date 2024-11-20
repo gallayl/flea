@@ -5,7 +5,7 @@
 #else
 #include <ArduinoOTA.h>
 #endif
-#include "../services/Logger.h"
+#include "../FeatureRegistry/Features/Logging.h"
 
 ArRequestHandlerFunction getUpdateForm = ([](AsyncWebServerRequest *request)
                                           { request->send(200, "text/html", F("<form method='POST' action='/update' accept='application/octet-stream' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>")); });
@@ -24,7 +24,7 @@ ArUploadHandlerFunction onUploadUpdate = ([](AsyncWebServerRequest *request, Str
         
         if (!Update.begin(request->contentLength(), U_FLASH))
         {
-            logInfo(String("Update failed with error" + Update.getError()));
+            Logger::GetInstance()->Error(String("Update failed with error" + Update.getError()));
             Update.printError(Serial);
         }
     }
@@ -42,7 +42,7 @@ ArUploadHandlerFunction onUploadUpdate = ([](AsyncWebServerRequest *request, Str
             AsyncWebServerResponse *response = request->beginResponse(200, "text/html", "<html><head><meta http-equiv=\"refresh\" content=\"5\"></head><body>Update done, page will be refreshed.</body></html>");
             response->addHeader("Refresh", "5");
             request->send(response);
-            logInfo("Update finished, will restart...");
+            Logger::GetInstance()->Info("Update finished, will restart...");
             delay(300);
             ESP.restart();
         }

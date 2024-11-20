@@ -3,7 +3,6 @@
 #include "../CommandParser.h"
 #include "../CustomCommand.h"
 #include "../../hw/Camera.h"
-#include "../../hw/Display.h"
 #include "../../hw/WiFi.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
@@ -81,7 +80,6 @@ CustomCommand *infoAction = new CustomCommand("info", [](String command)
 #endif
 
     JsonObject status = response["status"].to<JsonObject>();
-    status["isDisplayAvailable"] = isDisplayAvailable;
 
     char buffer[512];
     serializeJson(response, buffer);

@@ -3,6 +3,10 @@
 #include <ArduinoJson.h>
 #include "../Feature.h"
 
+typedef void (*LogListener)(String, String);
+
+#define LOG_LISTENERS_COUNT 10
+
 class Logger
 {
 public:
@@ -35,10 +39,19 @@ public:
         this->handle("DEBUG", message);
     }
 
+    void AddListener(LogListener listener)
+    {
+        this->listeners[this->listenersCount] = listener;
+        this->listenersCount++;
+    }
+
 private:
     static Logger *instance;
 
     JsonArray entries;
+
+    byte listenersCount;
+    LogListener listeners[LOG_LISTENERS_COUNT];
 
     void handle(String severity, String message)
     {
@@ -50,7 +63,7 @@ private:
 
     void addEntry(String severity, String message)
     {
-        JsonObject entry = this->entries.createNestedObject();
+        JsonObject entry = this->entries.add<JsonObject>();
         entry["severity"] = severity;
         entry["message"] = message;
     }
@@ -58,5 +71,9 @@ private:
     Logger() {}
 };
 
+Logger *Logger::instance = nullptr;
+
 Feature *Logging = new Feature("Logging", []()
                                { Logger::GetInstance(); }, []() {});
+
+

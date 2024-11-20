@@ -27,14 +27,13 @@ void initMovement()
 
 void stopMoving()
 {
-    pwm.setAllChannelsPWM(0);
+    pwm.sleep();
 }
 
 void move(int speed, int steer)
 {
-    uint16_t pwms[3];
-    pwms[BACK_LEFT_CHANNEL] = constrain((BACK_LEFT_CENTER + speed), BACK_LEFT_MAX_FORWARD, BACK_LEFT_MAX_BACKWARD);
-    pwms[BACK_RIGHT_CHANNEL] = constrain((BACK_RIGHT_CENTER - speed), BACK_RIGHT_MAX_FORWARD, BACK_RIGHT_MAX_BACKWARD);
-    pwms[STEER_CHANNEL] = constrain((STEER_CENTER - steer), STEER_MAX_RIGHT, STEER_MAX_LEFT);
-    pwm.setChannelsPWM(0, 3, pwms);
+    pwm.wakeup();
+    pwm.setPWM(BACK_LEFT_CHANNEL, 0, constrain((BACK_LEFT_CENTER + speed), BACK_LEFT_MAX_FORWARD, BACK_LEFT_MAX_BACKWARD));
+    pwm.setPWM(BACK_RIGHT_CHANNEL, 0, constrain((BACK_RIGHT_CENTER - speed), BACK_RIGHT_MAX_FORWARD, BACK_RIGHT_MAX_BACKWARD));
+    pwm.setPWM(STEER_CHANNEL,0, constrain((STEER_CENTER - steer), STEER_MAX_RIGHT, STEER_MAX_LEFT));
 }

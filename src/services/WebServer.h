@@ -11,7 +11,7 @@
 #include <ESPAsyncWebServer.h>
 #include <LittleFS.h>
 #include "./Config.h"
-#include "./Logger.h"
+#include "./FeatureRegistry/Features/Logging.h"
 #include "../mime.h"
 #include "../api/update.h"
 #include "../api/camera.h"
@@ -26,7 +26,7 @@ void initWebServer()
 {
     uint8_t port = configJson[CONFIG_HTTP_PORT].as<int>();
 
-    logInfo(F("Starting WEB server"));
+    Logger::GetInstance()->Info(F("Starting WEB server"));
 
     server = new AsyncWebServer(port);
 
@@ -53,11 +53,11 @@ void initWebServer()
 
     server->onNotFound([](AsyncWebServerRequest *req)
                        {
-                        logInfo("Not found: " + req->url());
+                        Logger::GetInstance()->Info("Not found: " + req->url());
         AsyncWebServerResponse *response = req->beginResponse(LittleFS, "/index.html", "text/html; charset=UTF-8");
         req->send(response); });
 
     server->begin();
 
-    logInfo(F("Server setup done."));
+    Logger::GetInstance()->Info(F("Server setup done."));
 }

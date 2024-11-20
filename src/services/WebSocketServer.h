@@ -11,6 +11,7 @@
 #include "./Config.h"
 #include "./WebServer.h"
 #include "../CommandInterpreter/CommandInterpreter.h"
+#include "../FeatureRegistry/Features/Logging.h"
 
 AsyncWebSocket *webSocket;
 
@@ -23,11 +24,11 @@ void initWebSockets()
         if (type == WS_EVT_CONNECT)
         {
             client->text("Connected to Rover ESP32");
-            logInfo(String("WS connected: " + client->remoteIP().toString()));
+            Logger::GetInstance()->Info(String("WS connected: " + client->remoteIP().toString()));
         }
         else if (type == WS_EVT_DISCONNECT)
         {
-            logInfo(String("WS left: " + client->remoteIP().toString()));
+            Logger::GetInstance()->Info(String("WS left: " + client->remoteIP().toString()));
         }
         else if (type == WS_EVT_DATA)
         {

@@ -2,7 +2,7 @@
 
 #include <LittleFS.h>
 
-#include "./Logger.h"
+#include "../FeatureRegistry/Features/Logging.h"
 #include "../utils/JsonMerge.h"
 
 #define CONFIG_FILE "/config.json"
@@ -28,11 +28,11 @@ void saveConfigFile()
     File configFile = LittleFS.open(CONFIG_FILE, "w");
     if (!configFile)
     {
-        logInfo("There was an error writing the config!");
+        Logger::GetInstance()->Error(F("There was an error writing the config!"));
     }
     serializeJsonPretty(configJson, configFile);
     configFile.close();
-    logInfo("Config saved.");
+    Logger::GetInstance()->Info(F("Config saved."));
 }
 
 void setDefaultConfig()
@@ -51,7 +51,7 @@ void setDefaultConfig()
 
 void initConfig()
 {
-    logInfo("Initializing Config...");
+    Logger::GetInstance()->Info(F("Initializing Config..."));
     setDefaultConfig();
 
 #ifdef ESP32
@@ -60,7 +60,7 @@ void initConfig()
     if (!LittleFS.begin())
 #endif
     {
-        logInfo("LittleFS not available, config will be the default");
+        Logger::GetInstance()->Info(F("LittleFS not available, config will be the default"));
         return;
     }
     else
@@ -73,23 +73,23 @@ void initConfig()
             switch (error.code())
             {
             case DeserializationError::Ok:
-                logInfo(F("Config file loaded succesfully."));
+                Logger::GetInstance()->Info(F("Config file loaded succesfully."));
                 merge(configJson.as<JsonVariant>(), fromFile.as<JsonVariantConst>());
                 break;
             case DeserializationError::InvalidInput:
-                logInfo(F("Invalid input!"));
+                Logger::GetInstance()->Error(F("Invalid input!"));
                 break;
             case DeserializationError::NoMemory:
-                logInfo(F("Not enough memory"));
+                Logger::GetInstance()->Error(F("Not enough memory"));
                 break;
             default:
-                logInfo(F("Deserialization failed"));
+                Logger::GetInstance()->Error(F("Deserialization failed"));
                 break;
             }
         }
         else
         {
-            logInfo("No config file, using defaults.");
+            Logger::GetInstance()->Info("No config file, using defaults.");
         }
     }
 }

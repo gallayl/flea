@@ -26,7 +26,7 @@ CustomCommand *pwmCommand = new CustomCommand("pwm", [](String fullCommand) {
             int channel = constrain(atoi(command), 0, 15);
             ++separator;
             long end = constrain(atol(separator), 0, 4095);
-            pwm.setChannelPWM(channel, end);
+            pwm.setPWM(channel, 0, end);
             result += "{\"channel\":";
             result += channel;
             result += ", \"end\":";

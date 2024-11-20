@@ -2,6 +2,7 @@
 #include "./Feature.h"
 
 #include "./Features/Logging.h"
+#include "./Features/Display.h"
 #include "./Features/SerialRead.h"
 
 #define FEATURES_SIZE 128
@@ -14,6 +15,13 @@ private:
     String _featureNames[FEATURES_SIZE];
 
     uint8_t _registeredFeaturesCount = 0;
+
+    FeatureRegistry()
+    {
+    }
+
+public:
+
     void RegisterFeature(Feature newCommand)
     {
         this->RegisteredFeatures[this->_registeredFeaturesCount] = newCommand;
@@ -21,11 +29,7 @@ private:
 
         Logger::GetInstance()->Info("Registered feature: " + newCommand.GetFeatureName());
     }
-    FeatureRegistry()
-    {
-    }
 
-public:
     /**
      * TODO: Check if its OK
      */
@@ -34,21 +38,30 @@ public:
         return this->_featureNames;
     }
 
+    void SetupFeatures()
+    {
+        for (uint8_t i = 0; i < this->_registeredFeaturesCount; i++)
+        {
+            this->RegisteredFeatures[i].Setup();
+        }
+    }
+
     Feature RegisteredFeatures[FEATURES_SIZE];
 
     static FeatureRegistry *GetInstance()
     {
-        if (instance == 0)
+        if (instance == nullptr)
         {
             FeatureRegistry *createdInstance = new FeatureRegistry();
-            createdInstance->RegisterFeature(*Logging);
-            createdInstance->RegisterFeature(*SerialRead);
-
             instance = createdInstance;
+            createdInstance->RegisterFeature(*Logging);
+            createdInstance->RegisterFeature(*DisplayFeature);
+            createdInstance->RegisterFeature(*SerialRead);
         }
 
         return instance;
     }
+    
 };
 
-FeatureRegistry *FeatureRegistry::instance = 0;
+FeatureRegistry *FeatureRegistry::instance = nullptr;
