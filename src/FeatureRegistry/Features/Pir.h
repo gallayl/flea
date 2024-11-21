@@ -13,19 +13,19 @@
 void IRAM_ATTR  pirMovement() {
   if (digitalRead(PIR_PIN) == HIGH) {
     LoggerInstance->Info("PIR movement detected");
-    webSocket->textAll("{\"type\":\"pir\",\"state\":1}");
+    webSocket->textAll("{\"type\":\"pir\",\"state\":true}");
     digitalWrite(LED_BUILTIN, HIGH);
   } else {
     LoggerInstance->Info("PIR movement stopped");
-    webSocket->textAll("{\"type\":\"pir\",\"state\":0}");
+    webSocket->textAll("{\"type\":\"pir\",\"state\":false}");
     digitalWrite(LED_BUILTIN, LOW);
   }
 }
 
 
 CustomCommand *getPirState = new CustomCommand("getPirState", [](String command) {
-  JsonObject response = JsonObject();
-  response["state"] = digitalRead(PIR_PIN);
+  JsonDocument response = JsonDocument().to<JsonObject>();
+  response["state"] = digitalRead(PIR_PIN) == HIGH ? true : false;
   char buffer[64];
   serializeJson(response, buffer);
   return String(buffer);

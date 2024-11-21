@@ -62,7 +62,10 @@
     "cinttypes": "cpp",
     "typeinfo": "cpp",
     "variant": "cpp",
-    "unordered_set": "cpp"
+    "unordered_set": "cpp",
+    "condition_variable": "cpp",
+    "mutex": "cpp",
+    "thread": "cpp"
   },
   "C_Cpp.default.compilerPath": "C:/Users/galla/.platformio/packages/toolchain-xtensa-esp32/bin/xtensa-esp32-elf-gcc.exe"
 }

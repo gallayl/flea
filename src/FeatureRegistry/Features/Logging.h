@@ -4,6 +4,7 @@
 #include <ArduinoJson.h>
 #include <ESPAsyncWebServer.h>
 #include "../Feature.h"
+#include "./Time.h"
 #include "../../CommandInterpreter/CustomCommand.h"
 #include "../../CommandInterpreter/CommandInterpreter.h"
 #include "../../services/WebServer.h"
@@ -25,17 +26,17 @@ public:
 
     void Info(String message)
     {
-        this->handle("INFO", message);
+        this->handle("I", message);
     }
 
     void Error(String message)
     {
-        this->handle("ERROR", message);
+        this->handle("E", message);
     }
 
     void Debug(String message)
     {
-        this->handle("DEBUG", message);
+        this->handle("D", message);
     }
 
     void AddListener(LogListener listener)
@@ -59,9 +60,15 @@ private:
 
     void handle(String severity, String message)
     {
-        this->addEntry(severity, message);
+        unsigned long epochTime = timeClient.getEpochTime();
+        String utcTime = getUtcTime();
+        
+        this->addEntry(severity, message, epochTime, utcTime);
+        Serial.print(F("["));
         Serial.print(severity);
-        Serial.print(F(": "));
+        Serial.print(F("] "));
+        Serial.print(utcTime);
+        Serial.print(F(" - "));
         Serial.println(message);
         for (byte i = 0; i < this->listenersCount; i++)
         {
@@ -69,11 +76,13 @@ private:
         }
     }
 
-    void addEntry(String severity, String message)
+    void addEntry(String severity, String message, unsigned long epochTime, String utcTime)
     {
         JsonObject entry = this->entries.add<JsonObject>();
         entry["severity"] = severity;
         entry["message"] = message;
+        entry["epochTime"] = epochTime;
+        entry["isoDateTime"] = utcTime;
     }
 
 };

@@ -3,6 +3,7 @@
 #include "../config.h"
 #include "./registeredFeatures.h"
 #include "./Feature.h"
+#include "./Features/Time.h"
 #include "./Features/Logging.h"
 #include "./Features/SystemFeatures.h"
 
@@ -60,6 +61,7 @@ public:
 
     FeatureRegistry()
     {
+        this->RegisterFeature(*TimeFeature);
         this->RegisterFeature(*LoggingFeature);
         this->RegisterFeature(*SystemFeatures);
 #if ENABLE_I2C_DISPLAY
