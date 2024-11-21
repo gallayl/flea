@@ -2,7 +2,7 @@
 #include "../../Feature.h"
 #include "../../../CommandInterpreter/CommandInterpreter.h"
 #include "../Logging.h"
-#include "./shoFileListCustomCommand.h"
+#include "./showFileListCustomCommand.h"
 #include "./formatCustomCommand.h"
 
 Feature *LittleFsFeature = new Feature("LittleFsFeatures", []() {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ArduinoJson.h>
 #include "../../../CommandInterpreter/CommandParser.h"
 #include "../../../CommandInterpreter/CustomCommand.h"
 #include "./Movement.h"

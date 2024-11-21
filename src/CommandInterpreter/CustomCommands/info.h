@@ -81,6 +81,6 @@ CustomCommand *infoAction = new CustomCommand("info", [](String command)
 
     JsonObject status = response["status"].to<JsonObject>();
 
-    char buffer[512];
+    char buffer[JSON_BUFFER_SIZE];
     serializeJson(response, buffer);
     return String(buffer); });

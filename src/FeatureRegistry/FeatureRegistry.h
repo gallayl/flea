@@ -28,6 +28,10 @@
 #include "./Features/esp32/Camera.h"
 #endif
 
+#if ENABLE_FLASHLIGHT
+#include "./Features/esp32/Flashlight.h"
+#endif
+
 #endif
 
 

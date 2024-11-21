@@ -5,7 +5,6 @@
 #include "../../Feature.h"
 #include "../Logging.h"
 #include "./CameraServer.h"
-#include "../../../services/Config.h"
 
 #include <esp_camera.h>
 
@@ -66,6 +65,12 @@ Feature* CameraFeature = new Feature("camera", [](){
         return FeatureState::ERROR;
     }
     LoggerInstance->Info(F("Cam initialized."));
+
+
+    server.on("/cam", HTTP_GET, getCameraImage);
+    server.on("/stream", HTTP_GET, getCameraStream);
+    server.on("/setupCam", HTTP_GET, setupCamera);
+
     return FeatureState::RUNNING;
 }, [](){});
 

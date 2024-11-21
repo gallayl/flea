@@ -24,29 +24,28 @@ CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command)
         {
             return String("{\"error\": \"ssid or password too short\"}");
         }
+        WiFi.disconnect(true, false);
         WiFi.persistent(true);
+        WiFi.mode(WIFI_AP);
         WiFi.begin(ssid.c_str(), password.c_str());
         return String("{\"event\": \"connecting\"}");
     }
     if (!operation.compareTo("list"))
     {
-        JsonDocument response;
-        JsonArray networks = response["networks"].as<JsonArray>();
+        JsonDocument response = JsonDocument().as<JsonArray>();;
 
         int n = WiFi.scanNetworks();
-        networks.begin();
 
         for (int i = 0; i < n; ++i)
         {
-            JsonObject element;
+            JsonObject element = response.as<JsonArray>().add<JsonObject>();
             element["ssid"] = WiFi.SSID(i);
             element["rssi"] = WiFi.RSSI(i);
             element["rssiText"] = getSignalStrength(WiFi.RSSI(i));
             element["encryption"] = getEncryptionType(WiFi.encryptionType(i));
-            networks.add(element);
+            response.add(element);
         }
-        networks.end();
-        char buffer[512];
+        char buffer[JSON_BUFFER_SIZE];
         serializeJson(response, buffer);
         return String(buffer);
     }
@@ -58,11 +57,7 @@ CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command)
         {
             return String("{\"error\": \"ssid or passpharse too short\"}");
         }
-
-        setConfigValue(CONFIG_SOFT_AP_SSID, ssid);
-        setConfigValue(CONFIG_SOFT_AP_KEY, passpharse);
-        setConfigValue(CONFIG_SOFT_AP_ENABLED, true);
-        reinitWifiSettings();
+        startStaMode(ssid, passpharse);
         return String("{\"event\": \"starting STA\"}");
     }
 
@@ -70,6 +65,7 @@ CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command)
     {
         bool success = WiFi.softAPdisconnect(true);
         WiFi.mode(WIFI_AP);
+        WiFi.begin();
         return String("{\"event\": \"stopSTA\", \"success\": " + String(success) + "}");
     }
 
@@ -89,19 +85,22 @@ CustomCommand *wifiCommand = new CustomCommand("wifi", [](String command)
         {
             JsonObject sta = response["sta"].to<JsonObject>();
             sta["ipAddress"] = WiFi.softAPIP().toString();
-            sta["gateway"] = configJson[CONFIG_SOFT_AP_GATEWAY];
-            sta["netmask"] = configJson[CONFIG_SOFT_AP_NETMASK];
             sta["macAddress"] = WiFi.softAPmacAddress();
-            sta["ssid"] = configJson[CONFIG_SOFT_AP_SSID];
-
         }
 
         int32_t rssi = WiFi.RSSI();
         response["wifiStrengh"] = getSignalStrength(rssi);
         response["wifiRssiDb"] = rssi;
 
-        char buffer[512];
+        char buffer[JSON_BUFFER_SIZE];
         serializeJson(response, buffer);
         return String(buffer);
+    }
+
+    if (!operation.compareTo("restart"))
+    {
+        WiFi.disconnect(true, false);
+        WiFi.begin();
+        return String("{\"event\": \"disconnecting\"}");
     }
     return String("{\"event\": \"Unknown WiFi operation command. The available commands are: info, list, connect <ssid> <password>, startSTA<ssid, password>, stopSTA\"}"); });

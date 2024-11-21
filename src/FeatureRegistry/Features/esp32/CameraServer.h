@@ -8,7 +8,6 @@
 #include <esp32cam-asyncweb.h>
 #include <ESPAsyncWebServer.h>
 #include <esp_camera.h>
-
 #define PART_BOUNDARY "frame"
 
 static const char *_STREAM_CONTENT_TYPE = "multipart/x-mixed-replace;boundary=" PART_BOUNDARY;
@@ -95,30 +94,13 @@ ArRequestHandlerFunction setupCamera = ([](AsyncWebServerRequest *request)
         obj["value"] = val;
         obj["response"] = res;
     }
-    char buffer[512];
+    char buffer[JSON_BUFFER_SIZE];
     serializeJson(response, buffer);
     request->send(200, MIME_json, String(buffer)); });
 
-ArRequestHandlerFunction setLights = ([](AsyncWebServerRequest *request)
-                                      {
-    int params = request->params();
-    for(int i=0;i<params;i++){
-        AsyncWebParameter* p = request->getParam(i);
-        String variable = p->name();
-        String value = p->value();
-        uint32_t val = constrain(value.toInt(),1,255);
-        if (!variable.compareTo("front")){
-            setFlashlightDuty(val);
-            request->send(200, MIME_json, String("Front set to:") + String(val));
-            return;
-        }
-    }
-    request->send(500, MIME_json, F("{\"success\":false}")); });
 
 
-    // server->on("/cam", HTTP_GET, getCameraImage);
-    // server->on("/stream", HTTP_GET, getCameraStream);
-    // server->on("/setupCam", HTTP_GET, setupCamera);
+
 
 #endif
 

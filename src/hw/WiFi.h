@@ -8,9 +8,8 @@
 #include <ESPAsyncTCP.h>
 #endif
 #include <WiFiClientSecure.h>
-
+#include "../config.h"
 #include "../FeatureRegistry/Features/Logging.h"
-#include "../FeatureRegistry/Features/configCustomCommand.h"
 
 String getSignalStrength(int32_t rssi)
 {
@@ -80,7 +79,7 @@ String getEncryptionType(uint8_t type)
 }
 #endif
 #ifdef ESP32
-void WiFiEvent(WiFiEvent_t event)
+void WiFiEventHandlerESP32(WiFiEvent_t event)
 {
 
     switch (event)
@@ -166,38 +165,67 @@ void WiFiEvent(WiFiEvent_t event)
 }
 #endif
 
-void reinitWifiSettings()
+void startStaMode(String ssid, String staPassPharse)
 {
-
-#ifdef ESP32
-    wifi_mode_t wifiMode = configJson[CONFIG_SOFT_AP_ENABLED].as<bool>() ? WIFI_AP_STA : WIFI_AP;
-#else
-    WiFiMode_t wifiMode = configJson[CONFIG_SOFT_AP_ENABLED].as<bool>() ? WIFI_AP_STA : WIFI_AP;
-#endif
-
-    if (wifiMode == WIFI_AP_STA)
-    {
-        IPAddress ip;
-        IPAddress gateway;
-        IPAddress netmask;
-
-        ip.fromString(configJson[CONFIG_SOFT_AP_IP].as<String>());
-        gateway.fromString(configJson[CONFIG_SOFT_AP_GATEWAY].as<String>());
-        netmask.fromString(configJson[CONFIG_SOFT_AP_NETMASK].as<String>());
-
-        WiFi.mode(wifiMode);
-        WiFi.softAPConfig(ip, gateway, netmask);
-        WiFi.softAP(configJson[CONFIG_SOFT_AP_SSID].as<String>().c_str(), configJson[CONFIG_SOFT_AP_KEY].as<String>().c_str());
+    if (WiFi.getMode() == WIFI_AP &&  WiFi.begin() != WL_CONNECTED){
+        WiFi.mode(WIFI_AP_STA);
+        WiFi.softAP(ssid, staPassPharse);
     }
 }
 
 void initWifi()
 {
 
-    reinitWifiSettings();
-
 #ifdef ESP32
-    WiFi.onEvent(WiFiEvent);
+    WiFi.onEvent(WiFiEventHandlerESP32);
 #endif
+
+#ifdef ESP8266
+
+    WiFi.onStationModeConnected([](const WiFiEventStationModeConnected &event) {
+        LoggerInstance->Info(F("Connected to access point"));
+    });
+
+    WiFi.onStationModeDisconnected([](const WiFiEventStationModeDisconnected &event) {
+        LoggerInstance->Info(F("Disconnected from WiFi access point"));
+    });
+
+    WiFi.onStationModeGotIP([](const WiFiEventStationModeGotIP &event) {
+        LoggerInstance->Info("Obtained IP address: " + WiFi.localIP().toString());
+    });
+
+    WiFi.onStationModeAuthModeChanged([](const WiFiEventStationModeAuthModeChanged &event) {
+        LoggerInstance->Info(F("Authentication mode of access point has changed"));
+    });
+
+    WiFi.onSoftAPModeStationConnected([](const WiFiEventSoftAPModeStationConnected &event) {
+        LoggerInstance->Info(F("Client connected"));
+    });
+
+    WiFi.onSoftAPModeStationDisconnected([](const WiFiEventSoftAPModeStationDisconnected &event) {
+        LoggerInstance->Info(F("Client disconnected"));
+    });
+
+    WiFi.onSoftAPModeProbeRequestReceived([](const WiFiEventSoftAPModeProbeRequestReceived &event) {
+        LoggerInstance->Info(F("Received probe request"));
+    });
+
+    WiFi.onWiFiModeChange([](const WiFiEventModeChange &event) {
+        LoggerInstance->Info(F("WiFi mode changed"));
+    });
+#endif
+
+    WiFi.mode(WIFI_AP);
     WiFi.begin();
+    wl_status_t state = (wl_status_t)WiFi.waitForConnectResult();
+
+    if (state != WL_CONNECTED)
+    {
+        LoggerInstance->Error(F("Failed to connect to access point"));
+        startStaMode(STA_SSID, STA_PASSPHARSE);
+    }
+    else
+    {
+        LoggerInstance->Info(F("Connected to access point"));
+    }
 }
