@@ -26,6 +26,10 @@
 #include "./Features/Dht22.h"
 #endif
 
+#if ENABLE_PIR_SENSOR
+#include "./Features/Pir.h"
+#endif
+
 #ifdef ESP32
 
 #if ENABLE_CAMERA
@@ -75,6 +79,10 @@ public:
 
 #if ENABLE_DHT22
         this->RegisterFeature(*Dht22Feature);
+#endif
+
+#if ENABLE_PIR_SENSOR
+        this->RegisterFeature(*PirFeature);
 #endif
 
     }

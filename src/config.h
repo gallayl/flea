@@ -42,6 +42,11 @@
  */
 #define ENABLE_DHT22 true
 
+/**
+ * Enable the PIR Sensor module. Doesn't work with ESP32 due to conflicting D6 sensor type
+ */
+#define ENABLE_PIR_SENSOR true
+
 #endif
 
 
