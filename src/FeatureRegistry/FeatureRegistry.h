@@ -22,6 +22,10 @@
 #include "./Features/LittleFsManagement/LittleFsManagement.h"
 #endif
 
+#if ENABLE_DHT22
+#include "./Features/Dht22.h"
+#endif
+
 #ifdef ESP32
 
 #if ENABLE_CAMERA
@@ -67,6 +71,10 @@ public:
 
 #if ENABLE_LITTLEFS
         this->RegisterFeature(*LittleFsFeature);
+#endif
+
+#if ENABLE_DHT22
+        this->RegisterFeature(*Dht22Feature);
 #endif
 
     }

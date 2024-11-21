@@ -11,11 +11,7 @@ int16_t steerValue = 0;
 void setup()
 {
     Serial.begin(9600);
-#ifdef ESP32
-    Wire.begin(GPIO_NUM_14, GPIO_NUM_15);
-#else
-    Wire.begin();
-#endif
+
     initWifi();
     initWebServer();
     initWebSockets();

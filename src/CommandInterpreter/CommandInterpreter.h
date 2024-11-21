@@ -1,7 +1,6 @@
 #pragma once
 #include "./CustomCommand.h"
-#include "./CustomCommands/i2c.h"
-// #include "./CustomCommands/info.h"
+#include "./CommandParser.h"
 
 #define COMMANDS_SIZE 128
 
@@ -13,7 +12,6 @@ public:
 
     CommandInterpreter()
     {
-            this->RegisterCommand(*i2cCommand);
             // this->RegisterCommand(*infoAction);
     }
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../CommandParser.h"
-#include "../CustomCommand.h"
+#include "../../CommandInterpreter/CustomCommand.h"
+#include "../../CommandInterpreter/CustomCommand.h"
 #include "../../hw/WiFi.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
@@ -45,10 +45,8 @@ String getResetReason()
 }
 #endif
 
-CustomCommand *infoAction = new CustomCommand("info", [](String command)
-                                              {
+JsonDocument getInfo(){
     JsonDocument response;
-
     JsonObject esp = response["esp"].to<JsonObject>();
 
     esp["sdkVersion"] = ESP.getSdkVersion();
@@ -79,7 +77,12 @@ CustomCommand *infoAction = new CustomCommand("info", [](String command)
 
 #endif
 
-    JsonObject status = response["status"].to<JsonObject>();
+    return response;
+}
+
+CustomCommand *infoCustomCommand = new CustomCommand("info", [](String command)
+                                              {
+    JsonDocument response = getInfo();
 
     char buffer[JSON_BUFFER_SIZE];
     serializeJson(response, buffer);

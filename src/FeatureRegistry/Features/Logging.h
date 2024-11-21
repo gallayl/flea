@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include <AsyncJson.h>  
 #include <ArduinoJson.h>
 #include <ESPAsyncWebServer.h>
 #include "../Feature.h"
@@ -90,10 +91,12 @@ CustomCommand *showLogCustomCommand = new CustomCommand("showLog", [](String com
 
 ArRequestHandlerFunction showLogRequestHandler = [](AsyncWebServerRequest *request)
 {
-    char buffer[LOG_BUFFER_LENGTH];
-    JsonDocument response = LoggerInstance->getEntries();
-    serializeJson(response, buffer);
-    request->send(200, "application/json", buffer);
+    AsyncJsonResponse * resp = new AsyncJsonResponse();
+    JsonDocument entries = LoggerInstance->getEntries();
+    resp->setCode(200);
+    resp->getRoot().set(entries);
+    resp->setLength();
+    request->send(resp);
 };
 
 Feature *LoggingFeature = new Feature("Logging", []()                               {

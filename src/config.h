@@ -33,6 +33,19 @@
 
 
 /**
+ * ESP-8266 specific features
+ */
+#ifdef ESP8266
+
+/**
+ * Enable DHT22 Sensor module. Doesn't work with ESP32 because of conflicting sensor_t types
+ */
+#define ENABLE_DHT22 true
+
+#endif
+
+
+/**
  * ESP32 specific features
  */
 #ifdef ESP32
