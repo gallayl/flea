@@ -3,9 +3,23 @@
 #include "../../../CommandInterpreter/CommandInterpreter.h"
 #include "../Logging.h"
 #include "./shoFileListCustomCommand.h"
+#include "./formatCustomCommand.h"
 
-Feature LittleFsFeatures = Feature("LittleFsFeatures", []() {
+Feature *LittleFsFeature = new Feature("LittleFsFeatures", []() {
+
+#ifdef ESP32
+    if (!LittleFS.begin(true))
+#else
+    if (!LittleFS.begin())
+#endif
+    {
+        LoggerInstance->Error(F("LittleFS not available"));
+        return FeatureState::ERROR;
+    }
+
     CommandInterpreterInstance->RegisterCommand(*showFileListCustomCommand);
+    CommandInterpreterInstance->RegisterCommand(*formatCustomCommand);
+    return FeatureState::RUNNING;
 }, []() {
     
 });

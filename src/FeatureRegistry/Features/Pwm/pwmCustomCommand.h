@@ -1,9 +1,10 @@
 #pragma once
 
-#include "../CommandParser.h"
-#include "../CustomCommand.h"
-#include "../../hw/Pwm.h"
-#include <Wire.h>
+#include "../../../CommandInterpreter/CommandParser.h"
+#include "../../../CommandInterpreter/CustomCommand.h"
+#include "./pwmInstance.h"
+
+#define PWM_COMMAND_INPUT_SIZE 64
 
 
 CustomCommand *pwmCommand = new CustomCommand("pwm", [](String fullCommand) {

@@ -7,6 +7,7 @@
 #include "./Logging.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <Wire.h>
 
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -18,15 +19,19 @@
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-bool isDisplayAvailable = false;
-
 CustomCommand *displayCommand = new CustomCommand("display", [](String command) {
     String operation = CommandParser::GetCommandParameter(command, 1);
     return String(F("Not implemented"));
 });
 
 Feature* DisplayFeature = new Feature("Display", []() {
-    isDisplayAvailable = display.begin(SSD1306_SWITCHCAPVCC, 0x3c);
+    bool success = display.begin(SSD1306_SWITCHCAPVCC, 0x3c);
+
+    if (!success) {
+        LoggerInstance->Error(F("Display not available"));
+        return FeatureState::ERROR;
+    }
+
     display.dim(false);
     display.setTextSize(1);      // Normal 1:1 pixel scale
     display.setTextColor(WHITE); // Draw white text
@@ -40,6 +45,7 @@ Feature* DisplayFeature = new Feature("Display", []() {
     display.print(message);
     display.display();
     });
+    return FeatureState::RUNNING;
 
 }, []() {
     

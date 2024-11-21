@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../hw/Pwm.h"
+#include "./pwmInstance.h"
 
 #define STEER_CHANNEL 0
 #define STEER_CENTER 450

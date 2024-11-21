@@ -5,7 +5,6 @@
 #include "./services/WebSocketServer.h"
 #include "./hw/Camera.h"
 #include "./hw/Flashlight.h"
-#include "./hw/Pwm.h"
 #include "./hw/WiFi.h"
 #include "./FeatureRegistry/FeatureRegistry.h"
 
@@ -20,7 +19,6 @@ void setup()
 #else
     Wire.begin();
 #endif
-    initPwm();
     initConfig();
     initWifi();
     initWebServer();

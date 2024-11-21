@@ -1,16 +1,16 @@
 #pragma once
 
-#include "../CommandParser.h"
-#include "../CustomCommand.h"
-#include "./pwm.h"
+#include "../../../CommandInterpreter/CommandParser.h"
+#include "../../../CommandInterpreter/CustomCommand.h"
+#include "./pwmInstance.h"
 
 #define SERVOMIN 100 // this is the 'minimum' pulse length count (out of 4096)
 #define SERVOMAX 550 // this is the 'maximum' pulse length count (out of 4096)
 
-#define PWM_COMMAND_INPUT_SIZE 64
+#define SERVO_COMMAND_INPUT_SIZE 64
 
 CustomCommand *servoCommand = new CustomCommand("servo", [](String fullCommand) {
-    char input[PWM_COMMAND_INPUT_SIZE + 1];
+    char input[SERVO_COMMAND_INPUT_SIZE + 1];
     CommandParser::GetCommandParameter(fullCommand, 1).toCharArray(input, fullCommand.length());
     byte size = fullCommand.length();
     // Add the final 0 to end the C string

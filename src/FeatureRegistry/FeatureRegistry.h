@@ -1,19 +1,31 @@
 #pragma once
 
-
-#define ENABLE_I2C_DISPLAY false
-
+#include "../config.h"
+#include "./registeredFeatures.h"
 #include "./Feature.h"
 #include "./Features/Logging.h"
-#include "./Features/SystemUtils.h"
+#include "./Features/SystemFeatures.h"
 
 #if ENABLE_I2C_DISPLAY
 #include "./Features/Display.h"
 #endif
 
+#if ENABLE_SERIAL_READ
 #include "./Features/SerialRead.h"
+#endif
+
+#if ENABLE_PWM
+#include "./Features/Pwm/PwmFeature.h"
+#endif
+
+#if ENABLE_LITTLEFS
+#include "./Features/LittleFsManagement/LittleFsManagement.h"
+#endif
+
+
 
 #define FEATURES_SIZE 128
+
 
 class FeatureRegistry
 {
@@ -33,36 +45,41 @@ public:
 #if ENABLE_I2C_DISPLAY
         this->RegisterFeature(*DisplayFeature);
 #endif
+#if ENABLE_SERIAL_READ
         this->RegisterFeature(*SerialReadFeature);
+#endif
+
+#if ENABLE_PWM
+        this->RegisterFeature(*PwmFeature);
+#endif
+
+#if ENABLE_LITTLEFS
+        this->RegisterFeature(*LittleFsFeature);
+#endif
+
     }
 
 
-    void RegisterFeature(Feature newCommand)
+    void RegisterFeature(Feature newFeature)
     {
-        this->RegisteredFeatures[this->_registeredFeaturesCount] = newCommand;
+        this->RegisteredFeatures[this->_registeredFeaturesCount] = newFeature;
         this->_registeredFeaturesCount++;
-    }
+        String featureName = newFeature.GetFeatureName();
 
-    /**
-     * TODO: Check if its OK
-     */
-    JsonArray GetFeaturesArray()
-    {
-        JsonArray response = JsonArray();
-        for (uint8_t i = 0; i < this->_registeredFeaturesCount; i++)
-        {
-            response.add(this->RegisteredFeatures[i].GetFeatureName());
-        }
-
-        return response;
+        JsonObject featureEntry = registeredFeatures[featureName].to<JsonObject>();
+        featureEntry["name"] = featureName;
+        featureEntry["state"] = (int) newFeature.GetFeatureState();
     }
 
     void SetupFeatures()
     {
         for (uint8_t i = 0; i < this->_registeredFeaturesCount; i++)
         {
-            LoggerInstance->Info("Setting up feature: " + this->RegisteredFeatures[i].GetFeatureName());
-            this->RegisteredFeatures[i].Setup();
+            String featureName = this->RegisteredFeatures[i].GetFeatureName();
+            LoggerInstance->Info("Setting up feature: " + featureName);
+            FeatureState newState = this->RegisteredFeatures[i].Setup();
+            JsonObject feature = registeredFeatures[featureName];
+            feature["state"].set((int) newState);
         }
     }
 

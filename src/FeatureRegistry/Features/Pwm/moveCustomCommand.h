@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../CommandParser.h"
-#include "../CustomCommand.h"
-#include "../../services/Movement.h"
+#include "../../../CommandInterpreter/CommandParser.h"
+#include "../../../CommandInterpreter/CustomCommand.h"
+#include "./Movement.h"
 
 #define MOTOR_COMM
 
-CustomCommand *moveAction = new CustomCommand("move", [](String fullCommand)
+CustomCommand *moveCustomCommand = new CustomCommand("move", [](String fullCommand)
                                               {
     JsonDocument response;
 

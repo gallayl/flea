@@ -86,5 +86,5 @@ CustomCommand *showLogAction = new CustomCommand("showLog", [](String command)
 
 
 Feature *LoggingFeature = new Feature("Logging", []()                               {
-    // CommandInterpreterInstance->RegisterCommand(*showLogAction);
+    return FeatureState::RUNNING;
                                 }, []() {});

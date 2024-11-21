@@ -1,18 +1,31 @@
 #pragma once
 #include <Arduino.h>
 
-typedef void (*FeatureSetupFunction)();
+enum class FeatureState
+{
+    PENDING = 0,
+    SETUP = 1,
+    RUNNING = 2,
+    ERROR = 3
+};
+
+
+typedef enum FeatureState (*FeatureSetupFunction)();
 
 typedef void (*FeatureLoopFunction)();
+
 
 class Feature
 {
 public:
-    Feature(String name = "featureName", FeatureSetupFunction setupCallback = []() {}, FeatureLoopFunction loopCallback = []() {}) : _featureName(name), _onSetup(setupCallback), _onLoop(loopCallback) {};
+    Feature(String name = "featureName", FeatureSetupFunction setupCallback = []() {return FeatureState::PENDING;}, FeatureLoopFunction loopCallback = []() {}) : _featureName(name), _onSetup(setupCallback), _onLoop(loopCallback) {};
 
-    void Setup()
+    FeatureState Setup()
     {
-        return this->_onSetup();
+        this->_featureState = FeatureState::SETUP;
+        FeatureState newState = this->_onSetup();
+        this->_featureState = newState;
+        return newState;
     }
 
     void Loop()
@@ -25,8 +38,16 @@ public:
         return this->_featureName;
     }
 
+    FeatureState GetFeatureState()
+    {
+        return this->_featureState;
+    }
+
+
+
 protected:
     String _featureName;
     FeatureSetupFunction _onSetup;
     FeatureLoopFunction _onLoop;
+    FeatureState _featureState;
 };

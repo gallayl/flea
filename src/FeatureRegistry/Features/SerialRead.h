@@ -4,7 +4,10 @@
 #include "../../CommandInterpreter/CommandInterpreter.h"
 
 
-Feature *SerialReadFeature = new Feature("SerialRead", []() {}, []()
+
+Feature *SerialReadFeature = new Feature("SerialRead", []() {
+    return FeatureState::RUNNING;
+}, []()
                                   {
     if (Serial.available())
     {

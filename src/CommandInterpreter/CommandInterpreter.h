@@ -3,9 +3,6 @@
 #include "CustomCommands/flashlight.h"
 #include "CustomCommands/i2c.h"
 #include "CustomCommands/info.h"
-#include "CustomCommands/move.h"
-#include "CustomCommands/pwm.h"
-#include "CustomCommands/servo.h"
 
 #define COMMANDS_SIZE 128
 
@@ -19,9 +16,6 @@ public:
     {
             this->RegisterCommand(*i2cCommand);
             this->RegisterCommand(*infoAction);
-            this->RegisterCommand(*servoCommand);
-            this->RegisterCommand(*moveAction);
-            this->RegisterCommand(*pwmCommand);
 #ifdef ESP32
             this->RegisterCommand(*flashlightAction);
 #endif
