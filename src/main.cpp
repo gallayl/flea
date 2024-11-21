@@ -3,7 +3,6 @@
 #include "./services/Config.h"
 #include "./services/WebServer.h"
 #include "./services/WebSocketServer.h"
-#include "./hw/Camera.h"
 #include "./hw/Flashlight.h"
 #include "./hw/WiFi.h"
 #include "./FeatureRegistry/FeatureRegistry.h"
@@ -25,7 +24,6 @@ void setup()
     initWebSockets();
 #ifdef ESP32
     initFlashlight();
-    initCamera();
 #endif
 
     FeatureRegistryInstance->SetupFeatures();

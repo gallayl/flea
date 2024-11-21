@@ -14,8 +14,6 @@
 #include "./FeatureRegistry/Features/Logging.h"
 #include "../mime.h"
 #include "../api/update.h"
-#include "../api/camera.h"
-#include "../api/lights.h"
 #include "../api/upload.h"
 #include "../api/list.h"
 #include "../api/showLog.h"
@@ -36,13 +34,6 @@ void initWebServer()
 
     server->on("/heap", HTTP_GET, [](AsyncWebServerRequest *request)
                { request->send(200, MIME_plainText, String(ESP.getFreeHeap())); });
-
-#ifdef ESP32
-    server->on("/cam", HTTP_GET, getCameraImage);
-    server->on("/stream", HTTP_GET, getCameraStream);
-    server->on("/setupCam", HTTP_GET, setupCamera);
-    server->on("/lights", HTTP_GET, setLights);
-#endif
 
     server->on("/uploadFiles", HTTP_POST, onPostUploadFiles, uploadFiles);
     server->on("/listFiles", HTTP_GET, listFiles);

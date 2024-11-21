@@ -2,10 +2,12 @@
 
 #ifdef ESP32
 
-#include "../mime.h"
-#include "../hw/Camera.h"
+#include <ArduinoJson.h>
+#include "../../../mime.h"
+#include "../../../services/WebServer.h"
 #include <esp32cam-asyncweb.h>
 #include <ESPAsyncWebServer.h>
+#include <esp_camera.h>
 
 #define PART_BOUNDARY "frame"
 
@@ -97,4 +99,26 @@ ArRequestHandlerFunction setupCamera = ([](AsyncWebServerRequest *request)
     serializeJson(response, buffer);
     request->send(200, MIME_json, String(buffer)); });
 
+ArRequestHandlerFunction setLights = ([](AsyncWebServerRequest *request)
+                                      {
+    int params = request->params();
+    for(int i=0;i<params;i++){
+        AsyncWebParameter* p = request->getParam(i);
+        String variable = p->name();
+        String value = p->value();
+        uint32_t val = constrain(value.toInt(),1,255);
+        if (!variable.compareTo("front")){
+            setFlashlightDuty(val);
+            request->send(200, MIME_json, String("Front set to:") + String(val));
+            return;
+        }
+    }
+    request->send(500, MIME_json, F("{\"success\":false}")); });
+
+
+    // server->on("/cam", HTTP_GET, getCameraImage);
+    // server->on("/stream", HTTP_GET, getCameraStream);
+    // server->on("/setupCam", HTTP_GET, setupCamera);
+
 #endif
+

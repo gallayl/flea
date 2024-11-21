@@ -1,9 +1,11 @@
 #pragma once
 
-#include "../FeatureRegistry/Features/Logging.h"
-
 #ifdef ESP32
 
+#include "../../Feature.h"
+#include "../Logging.h"
+#include "./CameraServer.h"
+#include "../../../services/Config.h"
 
 #include <esp_camera.h>
 
@@ -25,11 +27,11 @@
 #define HREF_GPIO_NUM 23
 #define PCLK_GPIO_NUM 22
 
-bool isCameraAvailable = false;
+
 esp_err_t cameraErrorCode = 0;
 
-void initCamera()
-{
+
+Feature* CameraFeature = new Feature("camera", [](){
     LoggerInstance->Info(F("Initializing Camera..."));
     camera_config_t config;
     config.ledc_channel = LEDC_CHANNEL_0;
@@ -61,13 +63,10 @@ void initCamera()
     if (cameraErrorCode != ESP_OK)
     {
         LoggerInstance->Error(String("Warning: Cam init failed with error 0x" + String(cameraErrorCode)));
+        return FeatureState::ERROR;
     }
-    isCameraAvailable = true;
     LoggerInstance->Info(F("Cam initialized."));
-}
-#else
-void initCamera()
-{
-    LoggerInstance->Info(F("Camera not supported, skipping init..."));
-}
+    return FeatureState::RUNNING;
+}, [](){});
+
 #endif

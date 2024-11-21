@@ -22,6 +22,14 @@
 #include "./Features/LittleFsManagement/LittleFsManagement.h"
 #endif
 
+#ifdef ESP32
+
+#if ENABLE_CAMERA
+#include "./Features/esp32/Camera.h"
+#endif
+
+#endif
+
 
 
 #define FEATURES_SIZE 128

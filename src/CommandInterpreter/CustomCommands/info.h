@@ -2,13 +2,13 @@
 
 #include "../CommandParser.h"
 #include "../CustomCommand.h"
-#include "../../hw/Camera.h"
 #include "../../hw/WiFi.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
 
 #ifdef ESP32
 #include <WiFi.h>
+#include "../../FeatureRegistry/Features/esp32/Camera.h"
 #else
 #include <ESP8266WiFi.h>
 #endif
