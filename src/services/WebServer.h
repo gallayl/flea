@@ -1,63 +1,46 @@
 #pragma once
 
-#ifdef ESP32
-#include <WiFi.h>
-#include <AsyncTCP.h>
-#else
-#include <ESP8266WiFi.h>
-#include <ESPAsyncTCP.h>
-#endif
+#include "../hw/WiFi.h"
 
 #include <ESPAsyncWebServer.h>
 #include <LittleFS.h>
-#include "./Config.h"
-#include "./Logger.h"
+#include "../config.h"
+#include "./FeatureRegistry/Features/Logging.h"
 #include "../mime.h"
 #include "../api/update.h"
-#include "../api/camera.h"
-#include "../api/lights.h"
 #include "../api/upload.h"
 #include "../api/list.h"
-#include "../api/showLog.h"
 
-AsyncWebServer *server;
+AsyncWebServer server(HTTP_PORT);
 
 void initWebServer()
 {
-    uint8_t port = configJson[CONFIG_HTTP_PORT].as<int>();
 
-    logInfo(F("Starting WEB server"));
+    server.reset();
 
-    server = new AsyncWebServer(port);
+    LoggerInstance->Info(F("Starting WEB server"));
 
     // Simple Firmware Update Form
-    server->on("/update", HTTP_GET, getUpdateForm);
-    server->on("/update", HTTP_POST, onPostUpdate, onUploadUpdate);
+    server.on("/update", HTTP_GET, getUpdateForm);
+    server.on("/update", HTTP_POST, onPostUpdate, onUploadUpdate);
 
-    server->on("/heap", HTTP_GET, [](AsyncWebServerRequest *request)
+    server.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request)
                { request->send(200, MIME_plainText, String(ESP.getFreeHeap())); });
 
-#ifdef ESP32
-    server->on("/cam", HTTP_GET, getCameraImage);
-    server->on("/stream", HTTP_GET, getCameraStream);
-    server->on("/setupCam", HTTP_GET, setupCamera);
-    server->on("/lights", HTTP_GET, setLights);
-#endif
+    server.on("/uploadFiles", HTTP_POST, onPostUploadFiles, uploadFiles);
+    server.on("/listFiles", HTTP_GET, listFiles);
 
-    server->on("/uploadFiles", HTTP_POST, onPostUploadFiles, uploadFiles);
-    server->on("/listFiles", HTTP_GET, listFiles);
 
-    server->on("/showLog", HTTP_GET, showLog);
+    server.serveStatic("/", LittleFS, "/", "max-age=600").setDefaultFile("index.html");
 
-    server->serveStatic("/", LittleFS, "/", "max-age=600").setDefaultFile("index.html");
-
-    server->onNotFound([](AsyncWebServerRequest *req)
+    server.onNotFound([](AsyncWebServerRequest *req)
                        {
-                        logInfo("Not found: " + req->url());
-        AsyncWebServerResponse *response = req->beginResponse(LittleFS, "/index.html", "text/html; charset=UTF-8");
-        req->send(response); });
+                        LoggerInstance->Info("Not found: " + req->url());
+        req->send(404); });
 
-    server->begin();
+    server.begin();
 
-    logInfo(F("Server setup done."));
+
+
+    LoggerInstance->Info(F("Server setup done."));
 }

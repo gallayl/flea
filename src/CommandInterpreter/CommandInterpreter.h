@@ -1,36 +1,26 @@
 #pragma once
-#include "CustomCommand.h"
-#include "CustomCommands/configAction.h"
-#include "CustomCommands/flashlight.h"
-#include "CustomCommands/format.h"
-#include "CustomCommands/i2c.h"
-#include "CustomCommands/info.h"
-#include "CustomCommands/list.h"
-#include "CustomCommands/move.h"
-#include "CustomCommands/pwm.h"
-#include "CustomCommands/reset.h"
-#include "CustomCommands/servo.h"
-#include "CustomCommands/showlog.h"
-#include "CustomCommands/wifi.h"
+#include "./CustomCommand.h"
+#include "./CommandParser.h"
 
 #define COMMANDS_SIZE 128
 
 class CommandInterpreter
 {
 private:
-    static CommandInterpreter *instance;
-
     uint8_t _registeredCommandsCount = 0;
+public:
+
+    CommandInterpreter()
+    {
+            // this->RegisterCommand(*infoAction);
+    }
+
     void RegisterCommand(CustomCommand newCommand)
     {
         this->RegisteredCommands[this->_registeredCommandsCount] = newCommand;
         this->_registeredCommandsCount++;
     }
-    CommandInterpreter()
-    {
-    }
 
-public:
     String getAvailableCommands()
     {
         String commands = "";
@@ -58,31 +48,7 @@ public:
     }
 
     CustomCommand RegisteredCommands[COMMANDS_SIZE];
-
-    static CommandInterpreter *GetInstance()
-    {
-        if (instance == 0)
-        {
-            CommandInterpreter *ci = new CommandInterpreter();
-            ci->RegisterCommand(*reset);
-            ci->RegisterCommand(*configAction);
-            ci->RegisterCommand(*i2cCommand);
-            ci->RegisterCommand(*infoAction);
-            ci->RegisterCommand(*servoCommand);
-            ci->RegisterCommand(*moveAction);
-            ci->RegisterCommand(*showLogAction);
-            ci->RegisterCommand(*pwmCommand);
-            ci->RegisterCommand(*wifiCommand);
-            ci->RegisterCommand(*formatCommand);
-            ci->RegisterCommand(*showFileListCustomCommand);
-#ifdef ESP32
-            ci->RegisterCommand(*flashlightAction);
-#endif
-            instance = ci;
-        }
-
-        return instance;
-    }
 };
 
-CommandInterpreter *CommandInterpreter::instance = 0;
+
+CommandInterpreter *CommandInterpreterInstance = new CommandInterpreter();

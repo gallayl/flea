@@ -8,8 +8,8 @@
 #include <ESPAsyncTCP.h>
 #endif
 #include <WiFiClientSecure.h>
-
-#include "../services/Logger.h"
+#include "../config.h"
+#include "../FeatureRegistry/Features/Logging.h"
 
 String getSignalStrength(int32_t rssi)
 {
@@ -79,85 +79,85 @@ String getEncryptionType(uint8_t type)
 }
 #endif
 #ifdef ESP32
-void WiFiEvent(WiFiEvent_t event)
+void WiFiEventHandlerESP32(WiFiEvent_t event)
 {
 
     switch (event)
     {
     case SYSTEM_EVENT_WIFI_READY:
-        logInfo("WiFi interface ready");
+        LoggerInstance->Info(F("WiFi interface ready"));
         break;
     case SYSTEM_EVENT_SCAN_DONE:
-        logInfo("Completed scan for access points");
+        LoggerInstance->Info(F("Completed scan for access points"));
         break;
     case SYSTEM_EVENT_STA_START:
-        logInfo("WiFi client started");
+        LoggerInstance->Info(F("WiFi client started"));
         break;
     case SYSTEM_EVENT_STA_STOP:
-        logInfo("WiFi clients stopped");
+        LoggerInstance->Info(F("WiFi clients stopped"));
         break;
     case SYSTEM_EVENT_STA_CONNECTED:
-        logInfo("Connected to access point");
+        LoggerInstance->Info(F("Connected to access point"));
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
-        logInfo("Disconnected from WiFi access point");
+        LoggerInstance->Info(F("Disconnected from WiFi access point"));
         break;
     case SYSTEM_EVENT_STA_AUTHMODE_CHANGE:
-        logInfo("Authentication mode of access point has changed");
+        LoggerInstance->Info(F("Authentication mode of access point has changed"));
         break;
     case SYSTEM_EVENT_STA_GOT_IP:
-        logInfo("Obtained IP address: " + WiFi.localIP().toString());
+        LoggerInstance->Info("Obtained IP address: " + WiFi.localIP().toString());
         break;
     case SYSTEM_EVENT_STA_LOST_IP:
-        logInfo("Lost IP address and IP address is reset to 0");
+        LoggerInstance->Info(F("Lost IP address and IP address is reset to 0"));
         break;
     case SYSTEM_EVENT_STA_WPS_ER_SUCCESS:
-        logInfo("WiFi Protected Setup (WPS): succeeded in enrollee mode");
+        LoggerInstance->Info(F("WiFi Protected Setup (WPS): succeeded in enrollee mode"));
         break;
     case SYSTEM_EVENT_STA_WPS_ER_FAILED:
-        logInfo("WiFi Protected Setup (WPS): failed in enrollee mode");
+        LoggerInstance->Info(F("WiFi Protected Setup (WPS): failed in enrollee mode"));
         break;
     case SYSTEM_EVENT_STA_WPS_ER_TIMEOUT:
-        logInfo("WiFi Protected Setup (WPS): timeout in enrollee mode");
+        LoggerInstance->Info(F("WiFi Protected Setup (WPS): timeout in enrollee mode"));
         break;
     case SYSTEM_EVENT_STA_WPS_ER_PIN:
-        logInfo("WiFi Protected Setup (WPS): pin code in enrollee mode");
+        LoggerInstance->Info(F("WiFi Protected Setup (WPS): pin code in enrollee mode"));
         break;
     case SYSTEM_EVENT_AP_START:
-        logInfo("WiFi access point started");
+        LoggerInstance->Info(F("WiFi access point started"));
         break;
     case SYSTEM_EVENT_AP_STOP:
-        logInfo("WiFi access point  stopped");
+        LoggerInstance->Info(F("WiFi access point  stopped"));
         break;
     case SYSTEM_EVENT_AP_STACONNECTED:
-        logInfo("Client connected");
+        LoggerInstance->Info(F("Client connected"));
         break;
     case SYSTEM_EVENT_AP_STADISCONNECTED:
-        logInfo("Client disconnected");
+        LoggerInstance->Info(F("Client disconnected"));
         break;
     case SYSTEM_EVENT_AP_STAIPASSIGNED:
-        logInfo("Assigned IP address to client");
+        LoggerInstance->Info(F("Assigned IP address to client"));
         break;
     case SYSTEM_EVENT_AP_PROBEREQRECVED:
-        logInfo("Received probe request");
+        LoggerInstance->Info(F("Received probe request"));
         break;
     case SYSTEM_EVENT_GOT_IP6:
-        logInfo("IPv6 is preferred");
+        LoggerInstance->Info(F("IPv6 is preferred"));
         break;
     case SYSTEM_EVENT_ETH_START:
-        logInfo("Ethernet started");
+        LoggerInstance->Info(F("Ethernet started"));
         break;
     case SYSTEM_EVENT_ETH_STOP:
-        logInfo("Ethernet stopped");
+        LoggerInstance->Info(F("Ethernet stopped"));
         break;
     case SYSTEM_EVENT_ETH_CONNECTED:
-        logInfo("Ethernet connected");
+        LoggerInstance->Info(F("Ethernet connected"));
         break;
     case SYSTEM_EVENT_ETH_DISCONNECTED:
-        logInfo("Ethernet disconnected");
+        LoggerInstance->Info(F("Ethernet disconnected"));
         break;
     case SYSTEM_EVENT_ETH_GOT_IP:
-        logInfo("Obtained IP address");
+        LoggerInstance->Info(F("Obtained IP address"));
         break;
     default:
         break;
@@ -165,38 +165,67 @@ void WiFiEvent(WiFiEvent_t event)
 }
 #endif
 
-void reinitWifiSettings()
+void startStaMode(String ssid, String staPassPharse)
 {
-
-#ifdef ESP32
-    wifi_mode_t wifiMode = configJson[CONFIG_SOFT_AP_ENABLED].as<bool>() ? WIFI_AP_STA : WIFI_AP;
-#else
-    WiFiMode_t wifiMode = configJson[CONFIG_SOFT_AP_ENABLED].as<bool>() ? WIFI_AP_STA : WIFI_AP;
-#endif
-
-    if (wifiMode == WIFI_AP_STA)
-    {
-        IPAddress ip;
-        IPAddress gateway;
-        IPAddress netmask;
-
-        ip.fromString(configJson[CONFIG_SOFT_AP_IP].as<String>());
-        gateway.fromString(configJson[CONFIG_SOFT_AP_GATEWAY].as<String>());
-        netmask.fromString(configJson[CONFIG_SOFT_AP_NETMASK].as<String>());
-
-        WiFi.mode(wifiMode);
-        WiFi.softAPConfig(ip, gateway, netmask);
-        WiFi.softAP(configJson[CONFIG_SOFT_AP_SSID].as<String>().c_str(), configJson[CONFIG_SOFT_AP_KEY].as<String>().c_str());
+    if (WiFi.getMode() == WIFI_AP &&  WiFi.begin() != WL_CONNECTED){
+        WiFi.mode(WIFI_AP_STA);
+        WiFi.softAP(ssid, staPassPharse);
     }
 }
 
 void initWifi()
 {
 
-    reinitWifiSettings();
-
 #ifdef ESP32
-    WiFi.onEvent(WiFiEvent);
+    WiFi.onEvent(WiFiEventHandlerESP32);
 #endif
+
+#ifdef ESP8266
+
+    WiFi.onStationModeConnected([](const WiFiEventStationModeConnected &event) {
+        LoggerInstance->Info(F("Connected to access point"));
+    });
+
+    WiFi.onStationModeDisconnected([](const WiFiEventStationModeDisconnected &event) {
+        LoggerInstance->Info(F("Disconnected from WiFi access point"));
+    });
+
+    WiFi.onStationModeGotIP([](const WiFiEventStationModeGotIP &event) {
+        LoggerInstance->Info("Obtained IP address: " + WiFi.localIP().toString());
+    });
+
+    WiFi.onStationModeAuthModeChanged([](const WiFiEventStationModeAuthModeChanged &event) {
+        LoggerInstance->Info(F("Authentication mode of access point has changed"));
+    });
+
+    WiFi.onSoftAPModeStationConnected([](const WiFiEventSoftAPModeStationConnected &event) {
+        LoggerInstance->Info(F("Client connected"));
+    });
+
+    WiFi.onSoftAPModeStationDisconnected([](const WiFiEventSoftAPModeStationDisconnected &event) {
+        LoggerInstance->Info(F("Client disconnected"));
+    });
+
+    WiFi.onSoftAPModeProbeRequestReceived([](const WiFiEventSoftAPModeProbeRequestReceived &event) {
+        LoggerInstance->Info(F("Received probe request"));
+    });
+
+    WiFi.onWiFiModeChange([](const WiFiEventModeChange &event) {
+        LoggerInstance->Info(F("WiFi mode changed"));
+    });
+#endif
+
+    WiFi.mode(WIFI_AP);
     WiFi.begin();
+    wl_status_t state = (wl_status_t)WiFi.waitForConnectResult();
+
+    if (state != WL_CONNECTED)
+    {
+        LoggerInstance->Error(F("Failed to connect to access point"));
+        startStaMode(STA_SSID, STA_PASSPHARSE);
+    }
+    else
+    {
+        LoggerInstance->Info(F("Connected to access point"));
+    }
 }
