@@ -87,7 +87,12 @@ public:
         this->RegisterFeature(*PirFeature);
 #endif
 
+#if ENABLE_CAMERA
+        this->RegisterFeature(*CameraFeature);
+#endif
     }
+
+
 
 
     void RegisterFeature(Feature newFeature)
