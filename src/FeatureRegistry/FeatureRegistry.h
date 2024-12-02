@@ -43,22 +43,16 @@
 
 #endif
 
-
-
 #define FEATURES_SIZE 128
-
 
 class FeatureRegistry
 {
 private:
-
     String _featureNames[FEATURES_SIZE];
 
     uint8_t _registeredFeaturesCount = 0;
 
-
 public:
-
     FeatureRegistry()
     {
         this->RegisterFeature(*TimeFeature);
@@ -90,10 +84,11 @@ public:
 #if ENABLE_CAMERA
         this->RegisterFeature(*CameraFeature);
 #endif
+
+#if ENABLE_FLASHLIGHT
+        this->RegisterFeature(*FlashlightFeature);
+#endif
     }
-
-
-
 
     void RegisterFeature(Feature newFeature)
     {
@@ -103,7 +98,7 @@ public:
 
         JsonObject featureEntry = registeredFeatures[featureName].to<JsonObject>();
         featureEntry["name"] = featureName;
-        featureEntry["state"] = (int) newFeature.GetFeatureState();
+        featureEntry["state"] = (int)newFeature.GetFeatureState();
     }
 
     void SetupFeatures()
@@ -114,7 +109,7 @@ public:
             LoggerInstance->Info("Setting up feature: " + featureName);
             FeatureState newState = this->RegisteredFeatures[i].Setup();
             JsonObject feature = registeredFeatures[featureName];
-            feature["state"].set((int) newState);
+            feature["state"].set((int)newState);
         }
     }
 
@@ -127,7 +122,6 @@ public:
     }
 
     Feature RegisteredFeatures[FEATURES_SIZE];
-
 };
 
 FeatureRegistry *FeatureRegistryInstance = new FeatureRegistry();
