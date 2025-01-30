@@ -60,7 +60,7 @@ private:
 
     void handle(String severity, String message)
     {
-        unsigned long epochTime = timeClient.getEpochTime();
+        unsigned long epochTime = getEpochTime();
         String utcTime = getUtcTime();
         
         this->addEntry(severity, message, epochTime, utcTime);

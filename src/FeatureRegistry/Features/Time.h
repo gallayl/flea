@@ -1,16 +1,19 @@
 #pragma once
-#include <NTPClient.h>
 #include <WiFiUdp.h>
 #include <stdio.h>
 #include <time.h> 
 #include "../Feature.h"
 
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 3600, 60000);
+#define MY_NTP_SERVER "pool.ntp.org"
+#define MY_TZ "CET-1CEST,M3.5.0,M10.5.0/3"
 
-time_t getNtpTime(){
-    timeClient.update();
-    return timeClient.getEpochTime();
+
+
+time_t getEpochTime()
+{
+  time_t now;  
+  time(&now);
+  return now;
 }
 
 String getUtcTime()
@@ -28,7 +31,6 @@ String getUtcTime()
 
 
 Feature *TimeFeature = new Feature("Time", []() {
-
-    timeClient.begin();
+    configTime(MY_TZ, MY_NTP_SERVER); 
     return FeatureState::RUNNING;
 }, [](){});

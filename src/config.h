@@ -66,11 +66,3 @@
 #define ENABLE_FLASHLIGHT true
 
 #endif
-
-/**
- * ESP8266 specific features
- */
-#ifdef ESP8266
-
-#endif
-
