@@ -14,21 +14,21 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@eslint/js": "^9.19.0",
-    "eslint": "^9.19.0",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-jsdoc": "^50.6.3",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.22.0",
-    "vite": "^6.0.11"
+    "@eslint/js": "^9.27.0",
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-jsdoc": "^50.6.17",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.1",
+    "vite": "^6.3.5"
   },
   "dependencies": {
-    "@furystack/inject": "^12.0.10",
-    "@furystack/logging": "^8.0.10",
-    "@furystack/shades": "^11.0.14",
-    "@furystack/shades-common-components": "^10.0.14",
-    "@furystack/shades-nipple": "^7.0.14",
-    "prettier": "^3.4.2"
+    "@furystack/inject": "^12.0.15",
+    "@furystack/logging": "^8.0.15",
+    "@furystack/shades": "^11.0.19",
+    "@furystack/shades-common-components": "^10.0.19",
+    "@furystack/shades-nipple": "^7.0.19",
+    "prettier": "^3.5.3"
   },
-  "packageManager": "yarn@4.6.0"
+  "packageManager": "yarn@4.9.1"
 }
