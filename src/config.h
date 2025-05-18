@@ -24,13 +24,12 @@
 /**
  * Enable the 16-channel PWM Controller
  */
-#define ENABLE_PWM false
+#define ENABLE_PWM true
 
 /**
  * Enable the I2C Display module
  */
 #define ENABLE_I2C_DISPLAY false
-
 
 /**
  * ESP-8266 specific features
@@ -48,7 +47,6 @@
 #define ENABLE_PIR_SENSOR true
 
 #endif
-
 
 /**
  * ESP32 specific features
