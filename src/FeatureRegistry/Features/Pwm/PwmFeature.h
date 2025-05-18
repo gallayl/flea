@@ -19,7 +19,6 @@ Feature *PwmFeature = new Feature("PwmFeature", []()
         return FeatureState::ERROR;
     }
 
-    pwm.setOscillatorFrequency(27000000);
     pwm.setPWMFreq(SERVO_FREQ);  // Analog servos run at ~50 Hz updates
 
     CommandInterpreterInstance->RegisterCommand(*moveCustomCommand);
