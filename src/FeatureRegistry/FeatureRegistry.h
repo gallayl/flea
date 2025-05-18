@@ -6,6 +6,7 @@
 #include "./Features/Time.h"
 #include "./Features/Logging.h"
 #include "./Features/SystemFeatures.h"
+#include "./Features/i2c.h"
 
 #if ENABLE_I2C_DISPLAY
 #include "./Features/Display.h"
@@ -48,80 +49,81 @@
 class FeatureRegistry
 {
 private:
-    String _featureNames[FEATURES_SIZE];
+        String _featureNames[FEATURES_SIZE];
 
-    uint8_t _registeredFeaturesCount = 0;
+        uint8_t _registeredFeaturesCount = 0;
 
 public:
-    FeatureRegistry()
-    {
-        this->RegisterFeature(*TimeFeature);
-        this->RegisterFeature(*LoggingFeature);
-        this->RegisterFeature(*SystemFeatures);
+        FeatureRegistry()
+        {
+                this->RegisterFeature(*TimeFeature);
+                this->RegisterFeature(*LoggingFeature);
+                this->RegisterFeature(*SystemFeatures);
+                this->RegisterFeature(*i2cFeature);
 #if ENABLE_I2C_DISPLAY
-        this->RegisterFeature(*DisplayFeature);
+                this->RegisterFeature(*DisplayFeature);
 #endif
 #if ENABLE_SERIAL_READ
-        this->RegisterFeature(*SerialReadFeature);
+                this->RegisterFeature(*SerialReadFeature);
 #endif
 
 #if ENABLE_PWM
-        this->RegisterFeature(*PwmFeature);
+                this->RegisterFeature(*PwmFeature);
 #endif
 
 #if ENABLE_LITTLEFS
-        this->RegisterFeature(*LittleFsFeature);
+                this->RegisterFeature(*LittleFsFeature);
 #endif
 
 #if ENABLE_DHT22
-        this->RegisterFeature(*Dht22Feature);
+                this->RegisterFeature(*Dht22Feature);
 #endif
 
 #if ENABLE_PIR_SENSOR
-        this->RegisterFeature(*PirFeature);
+                this->RegisterFeature(*PirFeature);
 #endif
 
 #if ENABLE_CAMERA
-        this->RegisterFeature(*CameraFeature);
+                this->RegisterFeature(*CameraFeature);
 #endif
 
 #if ENABLE_FLASHLIGHT
-        this->RegisterFeature(*FlashlightFeature);
+                this->RegisterFeature(*FlashlightFeature);
 #endif
-    }
-
-    void RegisterFeature(Feature newFeature)
-    {
-        this->RegisteredFeatures[this->_registeredFeaturesCount] = newFeature;
-        this->_registeredFeaturesCount++;
-        String featureName = newFeature.GetFeatureName();
-
-        JsonObject featureEntry = registeredFeatures[featureName].to<JsonObject>();
-        featureEntry["name"] = featureName;
-        featureEntry["state"] = (int)newFeature.GetFeatureState();
-    }
-
-    void SetupFeatures()
-    {
-        for (uint8_t i = 0; i < this->_registeredFeaturesCount; i++)
-        {
-            String featureName = this->RegisteredFeatures[i].GetFeatureName();
-            LoggerInstance->Info("Setting up feature: " + featureName);
-            FeatureState newState = this->RegisteredFeatures[i].Setup();
-            JsonObject feature = registeredFeatures[featureName];
-            feature["state"].set((int)newState);
         }
-    }
 
-    void LoopFeatures()
-    {
-        for (uint8_t i = 0; i < this->_registeredFeaturesCount; i++)
+        void RegisterFeature(Feature newFeature)
         {
-            this->RegisteredFeatures[i].Loop();
-        }
-    }
+                this->RegisteredFeatures[this->_registeredFeaturesCount] = newFeature;
+                this->_registeredFeaturesCount++;
+                String featureName = newFeature.GetFeatureName();
 
-    Feature RegisteredFeatures[FEATURES_SIZE];
+                JsonObject featureEntry = registeredFeatures[featureName].to<JsonObject>();
+                featureEntry["name"] = featureName;
+                featureEntry["state"] = (int)newFeature.GetFeatureState();
+        }
+
+        void SetupFeatures()
+        {
+                for (uint8_t i = 0; i < this->_registeredFeaturesCount; i++)
+                {
+                        String featureName = this->RegisteredFeatures[i].GetFeatureName();
+                        LoggerInstance->Info("Setting up feature: " + featureName);
+                        FeatureState newState = this->RegisteredFeatures[i].Setup();
+                        JsonObject feature = registeredFeatures[featureName];
+                        feature["state"].set((int)newState);
+                }
+        }
+
+        void LoopFeatures()
+        {
+                for (uint8_t i = 0; i < this->_registeredFeaturesCount; i++)
+                {
+                        this->RegisteredFeatures[i].Loop();
+                }
+        }
+
+        Feature RegisteredFeatures[FEATURES_SIZE];
 };
 
 FeatureRegistry *FeatureRegistryInstance = new FeatureRegistry();
