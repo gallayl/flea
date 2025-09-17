@@ -60,6 +60,7 @@ String writeDevice(uint16_t address, String data){
         }
 
         Wire.endTransmission();
+        return String("Writed.");
 }
 
 
