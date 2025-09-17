@@ -34,7 +34,7 @@ String scanDevices(){
     return String(buffer);
 }
 
-String readDevice(uint16_t address, uint16_t size){
+String readDevice(int address, int size){
     Wire.requestFrom(address, size);
     return String(Wire.read());
 }

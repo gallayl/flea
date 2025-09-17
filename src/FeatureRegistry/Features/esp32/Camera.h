@@ -69,7 +69,7 @@ Feature* CameraFeature = new Feature("camera", [](){
 
     server.on("/cam", HTTP_GET, getCameraImage);
     server.on("/stream", HTTP_GET, getCameraStream);
-    server.on("/setupCam", HTTP_GET, setupCamera);
+    server.on("/cam-settings", HTTP_POST, getCameraSettings, NULL, updateCameraSettings );
 
     return FeatureState::RUNNING;
 }, [](){});
