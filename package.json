@@ -1,0 +1,16 @@
+{
+  "name": "flea",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/gallayl/flea.git",
+  "author": "Gallay Lajos",
+  "license": "MIT",
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "start:frontend": "yarn workspace flea-frontend start"
+  },
+  "private": true,
+  "packageManager": "yarn@4.9.4"
+}
