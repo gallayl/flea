@@ -13,11 +13,20 @@
 
 AsyncWebServer server(HTTP_PORT);
 
+AsyncCorsMiddleware* corsMiddleware = new AsyncCorsMiddleware();
+
 void initWebServer()
 {
-
     server.reset();
 
+    corsMiddleware->setOrigin("*");
+    corsMiddleware->setMethods("GET, POST, OPTIONS, PUT, DELETE, PATCH, HEAD");
+    corsMiddleware->setHeaders("*");
+    corsMiddleware->setAllowCredentials(true);
+
+
+    server.addMiddleware(corsMiddleware);
+    
     LoggerInstance->Info(F("Starting WEB server"));
 
     // Simple Firmware Update Form
@@ -39,8 +48,6 @@ void initWebServer()
         req->send(404); });
 
     server.begin();
-
-
 
     LoggerInstance->Info(F("Server setup done."));
 }
